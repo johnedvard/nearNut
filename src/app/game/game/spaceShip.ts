@@ -3,6 +3,7 @@ import { MonetizeEvent } from 'src/app/shared/monetizeEvent';
 
 import { GameEvent } from './gameEvent';
 import { PlayerState } from './playerState';
+import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 import { spaceShipRenderers } from './spaceShipRenderers';
 
 export class SpaceShip {
@@ -37,7 +38,7 @@ export class SpaceShip {
       width: 15 * props.scale,
       height: 10 * props.scale,
       dx: 0,
-      anchor: { x: 0.1, y: 0.5 },
+      anchor: { x: 0.5, y: 0.5 },
       rotation: -Math.PI / 2,
       render: function () {
         spaceShip.renderSpaceShip(this, spaceShip.isSubscriber);
@@ -68,7 +69,7 @@ export class SpaceShip {
     this.isSubscriber = true;
   }
 
-  onPlayerStateChange(evt: { state: PlayerState; ship: SpaceShip }) {
+  onPlayerStateChange(evt: PlayerStateChangeEvent) {
     if (evt.ship === this) {
       this.playerState = evt.state;
     }

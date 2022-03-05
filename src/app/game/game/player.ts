@@ -78,8 +78,9 @@ class Player implements IGameObject {
       this.setPlayerState(PlayerState.idle);
     }
   }
-  onHitWall({ point, go }: { point: Vector; go: Sprite }) {
-    if (go === this.sprite) {
+
+  onHitWall({ go }: { go: IGameObject }) {
+    if (go === this) {
       this.setPlayerState(PlayerState.dead);
     }
   }
