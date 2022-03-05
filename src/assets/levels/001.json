@@ -1,0 +1,13 @@
+{
+  "tilewidth": 32,
+  "tileheight": 32,
+  "width": 4,
+  "height": 4,
+  "tilesets": [{}],
+  "layers": [
+    {
+      "name": "ground",
+      "data": [4, 5, 5, 6, 16, 0, 0, 18, 16, 0, 0, 18, 28, 29, 29, 30]
+    }
+  ]
+}

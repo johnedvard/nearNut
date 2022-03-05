@@ -16,31 +16,35 @@ class Player implements IGameObject {
   speed: number;
   effect: EngineParticleEffect;
   rotating = false;
+  scale: number;
   constructor(
     private game: Game,
-    private scale: number,
     private playerProps: {
+      scale: number;
       color: string;
       isAi: boolean;
       spaceShipRenderIndex: number;
       playerId: number;
+      x: number;
+      y: number;
     }
   ) {
-    this.effect = new EngineParticleEffect();
+    this.scale = this.playerProps.scale || 1;
     this.speed = 100 * this.scale;
     const spriteProps = {
-      x: 0,
-      y: 0,
+      x: this.playerProps.x || 0,
+      y: this.playerProps.y || 0,
       color: this.playerProps.color || '#000',
     };
     const [leftKey, rightKey] = getPlayerControls();
-    this.spaceShip = new SpaceShip(this.game, this.playerState, {
+    this.spaceShip = new SpaceShip(this.playerState, {
       scale: this.scale,
       spriteProps,
       isPreview: false,
       rightKey,
       leftKey,
     });
+    this.effect = new EngineParticleEffect();
 
     on(GameEvent.startTrace, () => this.onStartTrace());
     on(GameEvent.hitWall, (evt: any) => this.onHitWall(evt));

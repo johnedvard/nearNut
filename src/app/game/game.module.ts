@@ -4,14 +4,9 @@ import { CommonModule } from '@angular/common';
 import { GameRoutingModule } from './game-routing.module';
 import { GameComponent } from './game/game.component';
 
-
 @NgModule({
-  declarations: [
-    GameComponent
-  ],
-  imports: [
-    CommonModule,
-    GameRoutingModule
-  ]
+  declarations: [GameComponent],
+  imports: [CommonModule, GameRoutingModule],
+  exports: [GameComponent],
 })
-export class GameModule { }
+export class GameModule {}

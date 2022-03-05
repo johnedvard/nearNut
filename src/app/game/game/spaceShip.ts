@@ -1,7 +1,6 @@
 import { keyPressed, on, Sprite } from 'kontra';
 import { MonetizeEvent } from 'src/app/shared/monetizeEvent';
 
-import { Game } from './game';
 import { GameEvent } from './gameEvent';
 import { PlayerState } from './playerState';
 import { spaceShipRenderers } from './spaceShipRenderers';
@@ -16,7 +15,6 @@ export class SpaceShip {
   rotating = false;
   isSubscriber = false;
   constructor(
-    private game: Game,
     private playerState: PlayerState,
     props: {
       scale: number;
@@ -32,9 +30,9 @@ export class SpaceShip {
     this.weaponKey = props.weaponKey || this.weaponKey;
     const spaceShip = this;
     const rotationSpeed = 5;
-    const ship: any = Sprite({
-      x: props.spriteProps.x,
-      y: props.spriteProps.y,
+    this.sprite = Sprite({
+      x: props.spriteProps.x || 0,
+      y: props.spriteProps.y || 0,
       color: props.spriteProps.color || '#000',
       width: 15 * props.scale,
       height: 10 * props.scale,
@@ -61,7 +59,6 @@ export class SpaceShip {
         this.y = this.y + this.dy * dt * Math.sin(this.rotation);
       },
     });
-    this.sprite = ship;
     on(GameEvent.playerStateChange, (evt: any) =>
       this.onPlayerStateChange(evt)
     );
