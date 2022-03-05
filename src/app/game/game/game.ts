@@ -5,7 +5,10 @@ import {
   initPointer,
   load,
   TileEngine,
+  emit,
+  onKey,
 } from 'kontra';
+import { GameEvent } from './gameEvent';
 import { IGameObject } from './iGameObject';
 import { Player } from './player';
 
@@ -26,8 +29,9 @@ export class Game {
     initKeys();
     initPointer();
     this.loadLevel(levelName).then((tileEngine) => {
-      canvas.height = tileEngine.mapheight * this.scale * 4;
-      canvas.width = tileEngine.mapwidth * this.scale * 4;
+      this.initKeyBindings();
+      canvas.height = tileEngine.mapheight * this.scale;
+      canvas.width = tileEngine.mapwidth * this.scale;
       this.canvas = canvas;
       this.ctx = this.canvas.getContext('2d');
       this.tileEngine = tileEngine;
@@ -72,6 +76,17 @@ export class Game {
         x: 50,
         y: 50,
       })
+    );
+  }
+
+  initKeyBindings() {
+    onKey(
+      'space',
+      (e) => {
+        emit(GameEvent.startGame, {});
+        emit(GameEvent.startTrace, {});
+      },
+      { handler: 'keyup' }
     );
   }
 }

@@ -124,8 +124,8 @@ class Player implements IGameObject {
   }
 
   updateEngineEffect(dt: number) {
-    this.effect.sprite.x = this.sprite.x - 5;
-    this.effect.sprite.y = this.sprite.y - 5;
+    this.effect.sprite.x = this.sprite.x - 4;
+    this.effect.sprite.y = this.sprite.y - 4;
     this.effect.dx = this.sprite.dx;
     this.effect.dy = this.sprite.dy;
     this.effect.rotation = this.sprite.rotation;

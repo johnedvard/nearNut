@@ -5,6 +5,8 @@ export const getPlayerControls = (): string[] => {
   // TODO (johnedvard) use user settings to configure keys
   let leftKey = 'a';
   let rightKey = 'd';
+  // let leftKey = 'arrowleft';
+  // let rightKey = 'arrowright';
   return [leftKey, rightKey];
 };
 
