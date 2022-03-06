@@ -11,8 +11,11 @@ import {
 } from 'kontra';
 import { GameEvent } from './gameEvent';
 import { GameState } from './gameState';
+import { rectCollision } from './gameUtils';
 import { Goal } from './goal';
+import { GoalSwitch } from './goalSwitch';
 import { IGameObject } from './iGameObject';
+import { LevelData } from './levelData';
 import { Player } from './player';
 import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
@@ -20,12 +23,14 @@ import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 export class Game {
   private gameState: GameState = GameState.loading;
   canvas: HTMLCanvasElement;
+  levelData: LevelData;
   gos: IGameObject[] = [];
   loop: GameLoop;
   tileEngine: TileEngine;
   ctx: CanvasRenderingContext2D;
   player: Player;
   goal: Goal;
+  goalSwitch: GoalSwitch;
   scale = 1;
   /**
    * The game only cares about one level at a time.
@@ -36,10 +41,12 @@ export class Game {
     const { canvas } = init(id);
     initKeys();
     initPointer();
-    this.loadLevel(levelName).then((tileEngine) => {
+    this.loadLevel(levelName).then(({ tileEngine, levelData }) => {
+      this.levelData = levelData;
       this.setGameState(GameState.ready);
-      this.initPlayer();
-      this.initGoal();
+      this.initPlayer(levelData.gameObjects.player);
+      this.initGoal(levelData.gameObjects.goal);
+      this.initGoalSwitch(levelData.gameObjects.goalSwitch);
       this.initKeyBindings();
       canvas.height = tileEngine.mapheight * this.scale;
       canvas.width = tileEngine.mapwidth * this.scale;
@@ -50,14 +57,17 @@ export class Game {
         update: (dt: number) => {
           this.player.update(dt);
           this.goal.update(dt);
+          this.goalSwitch.update(dt);
           this.gos.forEach((go: any) => {
             go.update(dt);
           });
           this.checkTileMapCollision(this.player);
+          this.checkGoalSwitchColllision(this.player);
         },
         render: () => {
           this.player.render();
           this.goal.render();
+          this.goalSwitch.render();
           this.gos.forEach((go: any) => {
             go.render();
           });
@@ -84,7 +94,7 @@ export class Game {
   }
 
   checkTileMapCollision(go: IGameObject) {
-    if (this.tileEngine) {
+    if (this.tileEngine && go) {
       const isCollision = this.tileEngine.layerCollidesWith(
         'ground',
         go.sprite
@@ -94,11 +104,20 @@ export class Game {
       }
     }
   }
+  checkGoalSwitchColllision(go: IGameObject) {
+    if (this.goalSwitch && go) {
+      if (rectCollision(this.goalSwitch.sprite, go.sprite)) {
+        emit(GameEvent.goalSwitchCollision, { other: go });
+      }
+    }
+  }
   resetGame() {
-    this.initPlayer();
+    this.initPlayer(this.levelData.gameObjects.player);
     this.setGameState(GameState.ready);
   }
-  loadLevel(levelName: string): Promise<TileEngine> {
+  loadLevel(
+    levelName: string
+  ): Promise<{ tileEngine: TileEngine; levelData: LevelData }> {
     return load(
       'assets/tilesets/tileset_32x32_default.png',
       'assets/levels/001.json'
@@ -106,24 +125,27 @@ export class Game {
       // can also use dataAssets (stores all kontra assets)
       assets[1].tilesets = [{ image: assets[0], firstgid: 1 }];
       const tileEngine = TileEngine({ ...assets[1] });
-      return tileEngine;
+      return { tileEngine, levelData: assets[1] };
     });
   }
 
-  initPlayer() {
+  initPlayer({ x, y }) {
     this.player = new Player(this, {
       scale: this.scale,
       color: '#af7F1E',
       isAi: false,
       spaceShipRenderIndex: 1,
       playerId: 1,
-      x: 50,
-      y: 50,
+      x: x,
+      y: y,
     });
   }
 
-  initGoal() {
-    this.goal = new Goal();
+  initGoal({ x, y }) {
+    this.goal = new Goal({ x, y });
+  }
+  initGoalSwitch({ x, y }) {
+    this.goalSwitch = new GoalSwitch({ x, y });
   }
   startGame() {
     switch (this.gameState) {

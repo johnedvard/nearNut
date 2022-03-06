@@ -6,4 +6,6 @@ export enum GameEvent {
   gameStateChange = 'gsc',
   gameOver = 'go',
   newGame = 'ng',
+  openGoal = 'og',
+  goalSwitchCollision = 'gscoll',
 }
