@@ -8,5 +8,15 @@
   </head>
   <body>
     <app-root></app-root>
+    <script>
+      // Use relative base href if we host on itch.io. We do this in order to load assets, and lazy load modules correctly
+      if (window.location.href.match("ssl.hwcdn.net")) {
+        window["base-href"] = window.location.pathname.replace(
+          "/index.html",
+          ""
+        );
+        console.log(window["base-href"]);
+      }
+    </script>
   </body>
 </html>

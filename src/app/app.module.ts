@@ -11,7 +11,7 @@ import { AppComponent } from './app.component';
   providers: [
     {
       provide: APP_BASE_HREF,
-      useValue: '',
+      useValue: window['base-href'] || '', // using base href from itch.io if hosted on itch io's iframe.
     },
   ],
   bootstrap: [AppComponent],

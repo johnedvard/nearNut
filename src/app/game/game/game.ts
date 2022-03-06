@@ -61,7 +61,9 @@ export class Game {
           this.gos.forEach((go: any) => {
             go.render();
           });
-          this.tileEngine.render();
+          if (tileEngine) {
+            this.tileEngine.render();
+          }
         },
       });
       this.loop.start();
