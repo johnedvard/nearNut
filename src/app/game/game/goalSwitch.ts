@@ -53,8 +53,9 @@ export class GoalSwitch implements IGameObject {
         frameHeight: 8,
         animations: {
           [this.ANIMATION_COLLECTED]: {
-            frames: '0..4',
+            frames: '0..5', // add one more frame to stop at an invisible sprite
             frameRate: 5,
+            loop: false,
           },
         },
       });
