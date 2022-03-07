@@ -7,5 +7,7 @@ export enum GameEvent {
   gameOver = 'go',
   newGame = 'ng',
   openGoal = 'og',
-  goalSwitchCollision = 'gscoll',
+  goalCollision = 'goalcollision',
+  goalSwitchCollision = 'gscollision',
+  levelComplete = 'levelcomplete',
 }

@@ -1,31 +1,51 @@
-import { load, on, Sprite, SpriteSheet } from 'kontra';
+import { emit, load, on, Sprite, SpriteSheet } from 'kontra';
 import { GameEvent } from './gameEvent';
 import { GoalState } from './goalState';
 import { IGameObject } from './iGameObject';
+import { Player } from './player';
 
 export class Goal implements IGameObject {
+  private state: GoalState = GoalState.closed;
   ANIMATION_CLOSED = 'closed';
   ANIMATION_OPENING = 'opening';
-  goalState: GoalState = GoalState.closed;
   sprite: Sprite;
 
   constructor({ x, y }) {
     this.initGoal({ x, y });
-    on(GameEvent.openGoal, () => this.onGoalOpen);
+    on(GameEvent.openGoal, () => this.onGoalOpen());
+    on(GameEvent.goalCollision, (evt) => this.onGoalCollision(evt));
   }
 
   onGoalOpen() {
-    this.setGoalState(GoalState.opening);
+    this.setState(GoalState.opening);
+  }
+  onGoalCollision({ other }) {
+    if (other instanceof Player) {
+      switch (this.state) {
+        case GoalState.opened:
+        case GoalState.opening:
+          emit(GameEvent.levelComplete);
+          break;
+        case GoalState.closed:
+          break;
+        default:
+      }
+    }
   }
 
-  setGoalState(state: GoalState) {
-    this.goalState = state;
-    if (this.goalState === GoalState.opening) {
-      this.sprite.currentAnimation =
-        this.sprite.animations[this.ANIMATION_OPENING];
-    } else {
-      this.sprite.currentAnimation =
-        this.sprite.animations[this.ANIMATION_CLOSED];
+  setState(state: GoalState) {
+    console.log('set state', state);
+    if (this.state !== state) {
+      this.state = state;
+      switch (state) {
+        case GoalState.opening:
+          this.sprite.currentAnimation =
+            this.sprite.animations[this.ANIMATION_OPENING];
+          break;
+        default:
+          this.sprite.currentAnimation =
+            this.sprite.animations[this.ANIMATION_CLOSED];
+      }
     }
   }
 
@@ -53,6 +73,7 @@ export class Goal implements IGameObject {
           [this.ANIMATION_OPENING]: {
             frames: '0..13',
             frameRate: 10,
+            loop: false,
           },
         },
       });

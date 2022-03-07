@@ -1,9 +1,11 @@
 import { keyPressed, load, on, Sprite, SpriteSheet } from 'kontra';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { MonetizeEvent } from 'src/app/shared/monetizeEvent';
 
 import { GameEvent } from './gameEvent';
+import { GoalSwitchState } from './goalSwitchState';
 import { IGameObject } from './iGameObject';
+import { Player } from './player';
 import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 import { spaceShipRenderers } from './spaceShipRenderers';

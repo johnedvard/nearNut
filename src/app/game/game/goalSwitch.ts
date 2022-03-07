@@ -1,32 +1,41 @@
-import { load, on, Sprite, SpriteSheet } from 'kontra';
+import { emit, load, on, Sprite, SpriteSheet } from 'kontra';
 import { GameEvent } from './gameEvent';
 import { GoalSwitchState } from './goalSwitchState';
 import { IGameObject } from './iGameObject';
+import { Player } from './player';
 
 export class GoalSwitch implements IGameObject {
+  private state: GoalSwitchState = GoalSwitchState.idle;
   ANIMATION_IDLE = 'idle';
   ANIMATION_COLLECTED = 'collected';
   sprite: Sprite;
+
   constructor({ x, y }) {
     this.initGoalSwitch({ x, y });
     on(GameEvent.goalSwitchCollision, (evt) => this.onGoalSwitchCollision(evt));
   }
 
-  onGoalSwitchCollision({ other: IGameObject }) {
-    this.setState(GoalSwitchState.collected);
+  onGoalSwitchCollision({ other }) {
+    if (other instanceof Player) {
+      this.setState(GoalSwitchState.collected);
+    }
   }
 
   setState(state: GoalSwitchState) {
-    switch (state) {
-      case GoalSwitchState.collected:
-        this.sprite.currentAnimation =
-          this.sprite.animations[this.ANIMATION_COLLECTED];
-        break;
-      case GoalSwitchState.idle:
-        this.sprite.currentAnimation =
-          this.sprite.animations[this.ANIMATION_IDLE];
-        break;
-      default:
+    if (this.state !== state) {
+      this.state = state;
+      switch (state) {
+        case GoalSwitchState.collected:
+          this.sprite.currentAnimation =
+            this.sprite.animations[this.ANIMATION_COLLECTED];
+          emit(GameEvent.openGoal);
+          break;
+        case GoalSwitchState.idle:
+          this.sprite.currentAnimation =
+            this.sprite.animations[this.ANIMATION_IDLE];
+          break;
+        default:
+      }
     }
   }
 

@@ -21,7 +21,7 @@ import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 
 export class Game {
-  private gameState: GameState = GameState.loading;
+  private state: GameState = GameState.loading;
   canvas: HTMLCanvasElement;
   levelData: LevelData;
   gos: IGameObject[] = [];
@@ -43,10 +43,8 @@ export class Game {
     initPointer();
     this.loadLevel(levelName).then(({ tileEngine, levelData }) => {
       this.levelData = levelData;
-      this.setGameState(GameState.ready);
-      this.initPlayer(levelData.gameObjects.player);
-      this.initGoal(levelData.gameObjects.goal);
-      this.initGoalSwitch(levelData.gameObjects.goalSwitch);
+      this.setState(GameState.ready);
+      this.initGame(levelData);
       this.initKeyBindings();
       canvas.height = tileEngine.mapheight * this.scale;
       canvas.width = tileEngine.mapwidth * this.scale;
@@ -63,6 +61,7 @@ export class Game {
           });
           this.checkTileMapCollision(this.player);
           this.checkGoalSwitchColllision(this.player);
+          this.checkGoalCollision(this.player);
         },
         render: () => {
           this.player.render();
@@ -80,16 +79,31 @@ export class Game {
     });
     on(GameEvent.startGame, () => this.onStartGame());
     on(GameEvent.playerStateChange, (evt) => this.onPlayerStateChange(evt));
+    on(GameEvent.levelComplete, () => this.onLevelComplete());
   }
 
+  initGame(levelData: LevelData) {
+    this.initPlayer(levelData.gameObjects.player);
+    this.initGoal(levelData.gameObjects.goal);
+    this.initGoalSwitch(levelData.gameObjects.goalSwitch);
+  }
+
+  onLevelComplete() {
+    console.log('level complete');
+    this.setState(GameState.gameOver);
+
+    // TODO (johnedvard)
+    // save state
+    // go to level selector? Go to next level?
+  }
   onStartGame() {
-    this.setGameState(GameState.inProgress);
+    this.setState(GameState.inProgress);
     emit(GameEvent.startTrace, {});
   }
 
   onPlayerStateChange(evt: PlayerStateChangeEvent) {
     if (evt?.state === PlayerState.dead) {
-      this.setGameState(GameState.gameOver);
+      this.setState(GameState.gameOver);
     }
   }
 
@@ -104,6 +118,7 @@ export class Game {
       }
     }
   }
+
   checkGoalSwitchColllision(go: IGameObject) {
     if (this.goalSwitch && go.sprite) {
       if (rectCollision(this.goalSwitch.sprite, go.sprite)) {
@@ -111,9 +126,18 @@ export class Game {
       }
     }
   }
+
+  checkGoalCollision(go: IGameObject) {
+    if (this.goalSwitch && go.sprite) {
+      if (rectCollision(this.goal.sprite, go.sprite)) {
+        emit(GameEvent.goalCollision, { other: go });
+      }
+    }
+  }
+
   resetGame() {
-    this.initPlayer(this.levelData.gameObjects.player);
-    this.setGameState(GameState.ready);
+    this.initGame(this.levelData);
+    this.setState(GameState.ready);
   }
   loadLevel(
     levelName: string
@@ -148,7 +172,7 @@ export class Game {
     this.goalSwitch = new GoalSwitch({ x, y });
   }
   startGame() {
-    switch (this.gameState) {
+    switch (this.state) {
       case GameState.ready:
         emit(GameEvent.startGame, {});
         break;
@@ -158,9 +182,11 @@ export class Game {
     }
   }
 
-  setGameState(state) {
-    this.gameState = state;
-    emit(GameEvent.gameStateChange, { state });
+  setState(state) {
+    if (this.state !== state) {
+      this.state = state;
+      emit(GameEvent.gameStateChange, { state });
+    }
   }
 
   initKeyBindings() {
