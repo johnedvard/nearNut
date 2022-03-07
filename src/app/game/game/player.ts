@@ -51,16 +51,22 @@ class Player implements IGameObject {
     on(GameEvent.gameOver, (evt: any) => this.onGameOver(evt));
     on(MonetizeEvent.progress, this.onMonetizeProgress);
 
-    this.sprite = this.spaceShip.sprite;
+    this.spaceShip.sprite$().subscribe((sprite) => {
+      this.sprite = sprite;
+    });
   }
   update(dt: number): void {
-    this.sprite.update(dt);
+    if (this.sprite) {
+      this.sprite.update(dt);
+    }
     this.updateEngineEffect(dt);
     this.wallCollision();
     this.updateDeadPlayer();
   }
   render(): void {
-    this.sprite.render();
+    if (this.sprite) {
+      this.sprite.render();
+    }
     this.effect.render();
     this.renderDeadPlayer();
   }
@@ -125,6 +131,7 @@ class Player implements IGameObject {
   }
 
   updateEngineEffect(dt: number) {
+    if (!this.sprite) return;
     this.effect.sprite.x = this.sprite.x - 4;
     this.effect.sprite.y = this.sprite.y - 4;
     this.effect.dx = this.sprite.dx;

@@ -11,7 +11,7 @@
     }
   ],
   "gameObjects": {
-    "player": { "x": 50, "y": 50 },
+    "player": { "x": 40, "y": 40 },
     "goal": { "x": 88, "y": 72 },
     "goalSwitch": { "x": 60, "y": 60 }
   }

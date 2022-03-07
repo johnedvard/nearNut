@@ -94,7 +94,7 @@ export class Game {
   }
 
   checkTileMapCollision(go: IGameObject) {
-    if (this.tileEngine && go) {
+    if (this.tileEngine && go.sprite) {
       const isCollision = this.tileEngine.layerCollidesWith(
         'ground',
         go.sprite
@@ -105,7 +105,7 @@ export class Game {
     }
   }
   checkGoalSwitchColllision(go: IGameObject) {
-    if (this.goalSwitch && go) {
+    if (this.goalSwitch && go.sprite) {
       if (rectCollision(this.goalSwitch.sprite, go.sprite)) {
         emit(GameEvent.goalSwitchCollision, { other: go });
       }
