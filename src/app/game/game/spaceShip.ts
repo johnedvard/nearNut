@@ -35,11 +35,8 @@ export class SpaceShip implements IGameObject {
     this.rightKey = props.rightKey || this.rightKey;
     this.leftKey = props.leftKey || this.leftKey;
     this.weaponKey = props.weaponKey || this.weaponKey;
-    const { x, y } = {
-      x: props.spriteProps.x || 0,
-      y: props.spriteProps.y || 0,
-    };
-    this.initSpaceShip({ x, y });
+
+    this.initSpaceShip(props.spriteProps);
     on(GameEvent.playerStateChange, (evt: any) =>
       this.onPlayerStateChange(evt)
     );
@@ -57,7 +54,7 @@ export class SpaceShip implements IGameObject {
     }
   }
 
-  initSpaceShip({ x, y }) {
+  initSpaceShip({ x, y, color }) {
     const spaceShip = this;
     const rotationSpeed = 5;
     load(

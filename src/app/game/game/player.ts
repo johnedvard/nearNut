@@ -34,7 +34,7 @@ class Player implements IGameObject {
     const spriteProps = {
       x: this.playerProps.x || 0,
       y: this.playerProps.y || 0,
-      color: this.playerProps.color || '#000',
+      color: this.playerProps.color || '#fff',
     };
     const [leftKey, rightKey] = getPlayerControls();
     this.spaceShip = new SpaceShip(this.playerState, {
