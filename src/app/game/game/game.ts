@@ -83,9 +83,9 @@ export class Game {
   }
 
   initGame(levelData: LevelData) {
-    this.initPlayer(levelData.gameObjects.player);
-    this.initGoal(levelData.gameObjects.goal);
-    this.initGoalSwitch(levelData.gameObjects.goalSwitch);
+    this.initPlayer(levelData.player);
+    this.initGoal(levelData.goal);
+    this.initGoalSwitch(levelData.goalSwitch);
   }
 
   onLevelComplete() {
@@ -149,7 +149,7 @@ export class Game {
       // can also use dataAssets (stores all kontra assets)
       assets[1].tilesets = [{ image: assets[0], firstgid: 1 }];
       const tileEngine = TileEngine({ ...assets[1] });
-      return { tileEngine, levelData: assets[1] };
+      return { tileEngine, levelData: assets[1].gameObjects };
     });
   }
 

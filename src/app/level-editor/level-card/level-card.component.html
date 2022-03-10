@@ -1,6 +1,11 @@
 <mat-card>
-  <mat-card-title>{{ levelName }}</mat-card-title>
-  <mat-card-actions align="end">
+  <mat-card-title>Level: {{ level?.name }}</mat-card-title>
+  <mat-card-content>
+    <button id="delLevel" mat-button (click)="clickDeleteLevel()">
+      Delete
+    </button>
+  </mat-card-content>
+  <mat-card-actions align="start">
     <button mat-button (click)="clickEditLevel()">Edit</button>
     <button mat-button (click)="clickPlayLevel()">Play</button>
   </mat-card-actions>
