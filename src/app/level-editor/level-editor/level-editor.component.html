@@ -1,21 +1,38 @@
-<mat-tab-group animationDuration="0ms">
-  <mat-tab label="My levels">
-    <div id="myLevels">
-      TODO use near-api-js to search for levels
-      <app-level-card
-        *ngFor="let level of levels; index as i"
-        [level]="level"
-      ></app-level-card>
-      <button
-        mat-raised-button
-        (click)="clickCreateNewLevel()"
-        [color]="'primary'"
-      >
-        Create new level
-      </button>
-    </div>
-  </mat-tab>
-  <mat-tab label="Find Level">
-    <div>TODO add input to search for token_id, and give the level a try</div>
-  </mat-tab>
-</mat-tab-group>
+<div *ngIf="!selectedLevel">
+  <mat-tab-group animationDuration="0ms">
+    <mat-tab label="My levels">
+      <button mat-button routerLink="/">Back</button>
+      <div id="myLevels">
+        TODO use near-api-js to search for levels
+        <app-level-card
+          *ngFor="let level of levels; index as i"
+          [level]="level"
+          (editLevel)="onEditLevel($event)"
+          (playLevel)="onPlayLevel($event)"
+        ></app-level-card>
+        <button
+          mat-raised-button
+          (click)="clickCreateNewLevel()"
+          [color]="'primary'"
+        >
+          Create new level
+        </button>
+      </div>
+    </mat-tab>
+    <mat-tab label="Find Level">
+      <button mat-button routerLink="/">Back</button>
+      <div>TODO add input to search for token_id, and give the level a try</div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+<div *ngIf="selectedLevel">
+  <div *ngIf="state === 'playing'">
+    <button mat-button (click)="goBackToSelection()">Back</button>
+    <app-game [level]="selectedLevel"></app-game>
+  </div>
+  <div *ngIf="state === 'editing'">
+    <button mat-button (click)="goBackToSelection()">Back</button>
+    <div id="tiles"></div>
+  </div>
+</div>

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Game } from './game';
+import { ILevelData } from './iLevelData';
 
 @Component({
   selector: 'app-game',
@@ -7,9 +8,11 @@ import { Game } from './game';
   styleUrls: ['./game.component.sass'],
 })
 export class GameComponent implements OnInit {
+  @Input() level: ILevelData;
+  game: Game;
   constructor() {}
 
   ngOnInit(): void {
-    new Game();
+    this.game = new Game();
   }
 }

@@ -15,6 +15,7 @@ import { rectCollision } from './gameUtils';
 import { Goal } from './goal';
 import { GoalSwitch } from './goalSwitch';
 import { IGameObject } from './iGameObject';
+import { ILevelData } from './iLevelData';
 import { LevelData } from './levelData';
 import { Player } from './player';
 import { PlayerState } from './playerState';
@@ -32,56 +33,72 @@ export class Game {
   goal: Goal;
   goalSwitch: GoalSwitch;
   scale = 1;
+  constructor();
+  constructor(level: ILevelData);
   /**
    * The game only cares about one level at a time.
    * Load level, create game objects
    * @param id canvas ID
    */
-  constructor(id: string = 'game', levelName: string = '001') {
+  constructor(idOrLevel?: string | ILevelData, levelName: string = '001') {
+    const id = 'game';
     const { canvas } = init(id);
     initKeys();
     initPointer();
-    this.loadLevel(levelName).then(({ tileEngine, levelData }) => {
-      this.levelData = levelData;
-      this.setState(GameState.ready);
-      this.initGame(levelData);
-      this.initKeyBindings();
-      canvas.height = tileEngine.mapheight * this.scale;
-      canvas.width = tileEngine.mapwidth * this.scale;
-      this.canvas = canvas;
-      this.ctx = this.canvas.getContext('2d');
-      this.tileEngine = tileEngine;
-      this.loop = GameLoop({
-        update: (dt: number) => {
-          this.player.update(dt);
-          this.goal.update(dt);
-          this.goalSwitch.update(dt);
-          this.gos.forEach((go: any) => {
-            go.update(dt);
-          });
-          this.checkTileMapCollision(this.player);
-          this.checkGoalSwitchColllision(this.player);
-          this.checkGoalCollision(this.player);
-        },
-        render: () => {
-          this.player.render();
-          this.goal.render();
-          this.goalSwitch.render();
-          this.gos.forEach((go: any) => {
-            go.render();
-          });
-          if (tileEngine) {
-            this.tileEngine.render();
-          }
-        },
+    if (idOrLevel && (<ILevelData>idOrLevel).tilewidth) {
+      this.loadLevelData(<ILevelData>idOrLevel).then(
+        ({ tileEngine, levelData }) => {
+          this.initGameLoop({ tileEngine, levelData, canvas });
+        }
+      );
+    } else {
+      console.log('load regular level');
+      this.loadLevel(levelName).then(({ tileEngine, levelData }) => {
+        this.initGameLoop({ tileEngine, levelData, canvas });
       });
-      this.loop.start();
-    });
+    }
+
     on(GameEvent.startGame, () => this.onStartGame());
     on(GameEvent.playerStateChange, (evt) => this.onPlayerStateChange(evt));
     on(GameEvent.levelComplete, () => this.onLevelComplete());
   }
 
+  initGameLoop({ tileEngine, levelData, canvas }) {
+    this.levelData = levelData;
+    this.setState(GameState.ready);
+    this.initGame(levelData);
+    this.initKeyBindings();
+    canvas.height = tileEngine.mapheight * this.scale;
+    canvas.width = tileEngine.mapwidth * this.scale;
+    this.canvas = canvas;
+    this.ctx = this.canvas.getContext('2d');
+    this.tileEngine = tileEngine;
+    this.loop = GameLoop({
+      update: (dt: number) => {
+        this.player.update(dt);
+        this.goal.update(dt);
+        this.goalSwitch.update(dt);
+        this.gos.forEach((go: any) => {
+          go.update(dt);
+        });
+        this.checkTileMapCollision(this.player);
+        this.checkGoalSwitchColllision(this.player);
+        this.checkGoalCollision(this.player);
+      },
+      render: () => {
+        this.player.render();
+        this.goal.render();
+        this.goalSwitch.render();
+        this.gos.forEach((go: any) => {
+          go.render();
+        });
+        if (tileEngine) {
+          this.tileEngine.render();
+        }
+      },
+    });
+    this.loop.start();
+  }
   initGame(levelData: LevelData) {
     this.initPlayer(levelData.player);
     this.initGoal(levelData.goal);
@@ -91,7 +108,7 @@ export class Game {
   onLevelComplete() {
     console.log('level complete');
     this.setState(GameState.gameOver);
-
+    this.resetGame();
     // TODO (johnedvard)
     // save state
     // go to level selector? Go to next level?
@@ -150,6 +167,16 @@ export class Game {
       assets[1].tilesets = [{ image: assets[0], firstgid: 1 }];
       const tileEngine = TileEngine({ ...assets[1] });
       return { tileEngine, levelData: assets[1].gameObjects };
+    });
+  }
+  loadLevelData(
+    level: ILevelData
+  ): Promise<{ tileEngine: TileEngine; levelData: LevelData }> {
+    return load('assets/tilesets/tileset_32x32_default.png').then((assets) => {
+      // can also use dataAssets (stores all kontra assets)
+      assets[1].tilesets = [{ image: assets[0], firstgid: 1 }];
+      const tileEngine = TileEngine({ ...level });
+      return { tileEngine, levelData: level.gameObjects };
     });
   }
 

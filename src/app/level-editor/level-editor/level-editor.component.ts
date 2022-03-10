@@ -3,14 +3,20 @@ import { Subscription } from 'rxjs';
 import { ILevelData } from 'src/app/game/game/iLevelData';
 import { LevelEditorService } from '../level-editor.service';
 
+type State = 'playing' | 'editing' | 'selecting';
 @Component({
   selector: 'app-level-editor',
   templateUrl: './level-editor.component.html',
   styleUrls: ['./level-editor.component.sass'],
 })
 export class LevelEditorComponent implements OnInit, OnDestroy {
+  state: State = 'playing';
   levelsSub: Subscription;
   levels: ILevelData[];
+  selectedLevel: ILevelData = null;
+  testWidth = new Array<number>(100).fill(0);
+  testHeight = new Array<number>(100).fill(0);
+
   constructor(private leveEditor: LevelEditorService) {}
 
   ngOnInit(): void {
@@ -25,7 +31,24 @@ export class LevelEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  clickCreateNewLevel() {
+  onPlayLevel(level: ILevelData): void {
+    this.selectedLevel = level;
+    this.setState('playing');
+  }
+  onEditLevel(level: ILevelData): void {
+    this.selectedLevel = level;
+    this.setState('editing');
+  }
+  goBackToSelection() {
+    this.selectedLevel = null;
+    this.setState('selecting');
+  }
+  setState(state: State): void {
+    console.log('set state', state);
+    this.state = state;
+  }
+
+  clickCreateNewLevel(): void {
     console.log('Create new level');
     // TODO (johnedvard)
     // Open dialog to create a new NFT
