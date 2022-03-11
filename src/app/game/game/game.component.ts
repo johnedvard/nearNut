@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Game } from './game';
 import { ILevelData } from './iLevelData';
+import { LevelEditor } from './levelEditor';
 
 @Component({
   selector: 'app-game',
@@ -9,10 +10,16 @@ import { ILevelData } from './iLevelData';
 })
 export class GameComponent implements OnInit {
   @Input() level: ILevelData;
+  @Input() isEditing = false;
   game: Game;
+  levelEditor: LevelEditor;
   constructor() {}
 
   ngOnInit(): void {
-    this.game = new Game();
+    if (this.isEditing) {
+      this.levelEditor = new LevelEditor(this.level);
+    } else {
+      this.game = new Game();
+    }
   }
 }

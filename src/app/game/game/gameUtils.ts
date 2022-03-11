@@ -1,5 +1,7 @@
-import { GameObject, Sprite } from 'kontra';
+import { GameObject, load, Sprite, TileEngine } from 'kontra';
 import { Game } from './game';
+import { ILevelData } from './iLevelData';
+import { LevelData } from './levelData';
 
 export const getPlayerControls = (): string[] => {
   // TODO (johnedvard) use user settings to configure keys
@@ -26,4 +28,32 @@ export const isOutOfBounds = (game: Game, go: Sprite): boolean => {
     go.y <= 0 ||
     go.y >= game.canvas.height
   );
+};
+
+export const loadLevelFromObject = (
+  level: ILevelData
+): Promise<{ tileEngine: TileEngine; levelData: LevelData }> => {
+  return load('assets/tilesets/tileset_32x32_default.png').then((assets) => {
+    // can also use dataAssets (stores all kontra assets)
+    level.tilesets = [{ image: assets[0], firstgid: 1 }];
+    const tileEngine = TileEngine({ ...level });
+    return { tileEngine, levelData: level.gameObjects };
+  });
+};
+
+export const loadLevelFromFile = (
+  levelName: string
+): Promise<{ tileEngine: TileEngine; levelData: LevelData }> => {
+  return load(
+    'assets/tilesets/tileset_32x32_default.png',
+    'assets/levels/001.json'
+  ).then((assets) => {
+    console.warn(
+      'Passing levelName not implemented yet. Always open same level'
+    );
+    // can also use dataAssets (stores all kontra assets)
+    assets[1].tilesets = [{ image: assets[0], firstgid: 1 }];
+    const tileEngine = TileEngine({ ...assets[1] });
+    return { tileEngine, levelData: assets[1].gameObjects };
+  });
 };
