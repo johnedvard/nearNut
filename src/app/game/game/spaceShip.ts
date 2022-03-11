@@ -3,9 +3,7 @@ import { Observable, Subject } from 'rxjs';
 import { MonetizeEvent } from 'src/app/shared/monetizeEvent';
 
 import { GameEvent } from './gameEvent';
-import { GoalSwitchState } from './goalSwitchState';
 import { IGameObject } from './iGameObject';
-import { Player } from './player';
 import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 import { spaceShipRenderers } from './spaceShipRenderers';
@@ -13,6 +11,7 @@ import { spaceShipRenderers } from './spaceShipRenderers';
 export class SpaceShip implements IGameObject {
   ANIMATION_TRACING = 'tracing';
   sprite: Sprite;
+  scale = 1;
   rightKey = 'right';
   leftKey = 'left';
   weaponKey = 'up';
@@ -32,6 +31,7 @@ export class SpaceShip implements IGameObject {
       weaponKey?: string;
     }
   ) {
+    this.scale = props.scale;
     this.rightKey = props.rightKey || this.rightKey;
     this.leftKey = props.leftKey || this.leftKey;
     this.weaponKey = props.weaponKey || this.weaponKey;
@@ -75,6 +75,8 @@ export class SpaceShip implements IGameObject {
       this.sprite = Sprite({
         x: x,
         y: y,
+        scaleX: this.scale,
+        scaleY: this.scale,
         anchor: { x: 0.5, y: 0.5 },
         animations: spriteSheet.animations,
         update: function (dt: number) {

@@ -38,20 +38,19 @@ export class LevelEditor {
       ctx.lineTo(col, mapheight);
     }
     ctx.stroke();
-    // Reset transformation matrix to the identity matrix
-    ctx.resetTransform();
   }
 
   initEditorLoop({ tileEngine, gameObjects }) {
     console.log(tileEngine);
     const mapheight = tileEngine.mapheight * this.scale;
     const mapwidth = tileEngine.mapwidth * this.scale;
+    this.ctx.imageSmoothingEnabled = false;
     this.canvas.height = mapheight;
     this.canvas.width = mapwidth;
-
+    this.ctx.scale(this.scale, this.scale);
     for (const key in gameObjects) {
       if (gameObjects.hasOwnProperty(key)) {
-        this.gos.push(createGameObject(key, gameObjects[key]));
+        this.gos.push(createGameObject(key, { ...gameObjects[key] }));
       }
     }
 

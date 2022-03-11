@@ -27,6 +27,7 @@ import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 
 export class Game {
   private state: GameState = GameState.loading;
+  scale = 1;
   canvas: HTMLCanvasElement;
   gameObjects: GameObjects;
   gos: IGameObject[] = [];
@@ -36,7 +37,6 @@ export class Game {
   player: Player;
   goal: Goal;
   goalSwitch: GoalSwitch;
-  scale = 1;
   constructor();
   constructor(level: ILevelData);
   /**
@@ -47,17 +47,19 @@ export class Game {
   constructor(idOrLevel?: string | ILevelData, levelName: string = '001') {
     const id = 'game';
     const { canvas } = init(id);
+    this.canvas = canvas;
+    this.ctx = this.canvas.getContext('2d');
     initKeys();
     initPointer();
     if (idOrLevel && (<ILevelData>idOrLevel).tilewidth) {
       loadLevelFromObject(<ILevelData>idOrLevel).then(
         ({ tileEngine, gameObjects }) => {
-          this.initGameLoop({ tileEngine, gameObjects, canvas });
+          this.initGameLoop({ tileEngine, gameObjects });
         }
       );
     } else {
       loadLevelFromFile(levelName).then(({ tileEngine, gameObjects }) => {
-        this.initGameLoop({ tileEngine, gameObjects, canvas });
+        this.initGameLoop({ tileEngine, gameObjects });
       });
     }
 
@@ -66,15 +68,16 @@ export class Game {
     on(GameEvent.levelComplete, () => this.onLevelComplete());
   }
 
-  initGameLoop({ tileEngine, gameObjects, canvas }) {
+  initGameLoop({ tileEngine, gameObjects }) {
     this.gameObjects = gameObjects;
     this.setState(GameState.ready);
     this.initGame(gameObjects);
     this.initKeyBindings();
-    canvas.height = tileEngine.mapheight * this.scale;
-    canvas.width = tileEngine.mapwidth * this.scale;
-    this.canvas = canvas;
-    this.ctx = this.canvas.getContext('2d');
+    this.ctx.imageSmoothingEnabled = false;
+    this.canvas.height = tileEngine.mapheight * this.scale;
+    this.canvas.width = tileEngine.mapwidth * this.scale;
+    this.ctx.scale(this.scale, this.scale);
+
     this.tileEngine = tileEngine;
     this.loop = GameLoop({
       update: (dt: number) => {
@@ -162,7 +165,7 @@ export class Game {
 
   initPlayer({ x, y }) {
     this.player = new Player({
-      scale: this.scale,
+      scale: 1,
       color: '#00ff00',
       x: x,
       y: y,
