@@ -20,7 +20,7 @@ import { Goal } from './goal';
 import { GoalSwitch } from './goalSwitch';
 import { IGameObject } from './iGameObject';
 import { ILevelData } from './iLevelData';
-import { LevelData } from './levelData';
+import { GameObjects } from './gameObjects';
 import { Player } from './player';
 import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
@@ -28,7 +28,7 @@ import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 export class Game {
   private state: GameState = GameState.loading;
   canvas: HTMLCanvasElement;
-  levelData: LevelData;
+  gameObjects: GameObjects;
   gos: IGameObject[] = [];
   loop: GameLoop;
   tileEngine: TileEngine;
@@ -51,13 +51,13 @@ export class Game {
     initPointer();
     if (idOrLevel && (<ILevelData>idOrLevel).tilewidth) {
       loadLevelFromObject(<ILevelData>idOrLevel).then(
-        ({ tileEngine, levelData }) => {
-          this.initGameLoop({ tileEngine, levelData, canvas });
+        ({ tileEngine, gameObjects }) => {
+          this.initGameLoop({ tileEngine, gameObjects, canvas });
         }
       );
     } else {
-      loadLevelFromFile(levelName).then(({ tileEngine, levelData }) => {
-        this.initGameLoop({ tileEngine, levelData, canvas });
+      loadLevelFromFile(levelName).then(({ tileEngine, gameObjects }) => {
+        this.initGameLoop({ tileEngine, gameObjects, canvas });
       });
     }
 
@@ -66,10 +66,10 @@ export class Game {
     on(GameEvent.levelComplete, () => this.onLevelComplete());
   }
 
-  initGameLoop({ tileEngine, levelData, canvas }) {
-    this.levelData = levelData;
+  initGameLoop({ tileEngine, gameObjects, canvas }) {
+    this.gameObjects = gameObjects;
     this.setState(GameState.ready);
-    this.initGame(levelData);
+    this.initGame(gameObjects);
     this.initKeyBindings();
     canvas.height = tileEngine.mapheight * this.scale;
     canvas.width = tileEngine.mapwidth * this.scale;
@@ -102,10 +102,10 @@ export class Game {
     });
     this.loop.start();
   }
-  initGame(levelData: LevelData) {
-    this.initPlayer(levelData.player);
-    this.initGoal(levelData.goal);
-    this.initGoalSwitch(levelData.goalSwitch);
+  initGame(gameObjects: GameObjects) {
+    this.initPlayer(gameObjects.player);
+    this.initGoal(gameObjects.goal);
+    this.initGoalSwitch(gameObjects.goalSwitch);
   }
 
   onLevelComplete() {
@@ -156,7 +156,7 @@ export class Game {
   }
 
   resetGame() {
-    this.initGame(this.levelData);
+    this.initGame(this.gameObjects);
     this.setState(GameState.ready);
   }
 

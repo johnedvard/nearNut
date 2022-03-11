@@ -10,13 +10,13 @@ export class LevelEditor {
     initKeys();
     initPointer();
     if (level) {
-      loadLevelFromObject(level).then(({ tileEngine, levelData }) => {
-        this.initEditorLoop({ tileEngine, canvas });
+      loadLevelFromObject(level).then(({ tileEngine, gameObjects }) => {
+        this.initEditorLoop({ tileEngine, gameObjects, canvas });
       });
     }
   }
 
-  initEditorLoop({ tileEngine, canvas }) {
+  initEditorLoop({ tileEngine, gameObjects, canvas }) {
     canvas.height = tileEngine.mapheight * this.scale;
     canvas.width = tileEngine.mapwidth * this.scale;
     const loop = GameLoop({
