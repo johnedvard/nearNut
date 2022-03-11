@@ -161,12 +161,9 @@ export class Game {
   }
 
   initPlayer({ x, y }) {
-    this.player = new Player(this, {
+    this.player = new Player({
       scale: this.scale,
       color: '#00ff00',
-      isAi: false,
-      spaceShipRenderIndex: 1,
-      playerId: 1,
       x: x,
       y: y,
     });

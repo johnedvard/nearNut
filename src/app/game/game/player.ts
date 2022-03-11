@@ -18,13 +18,9 @@ class Player implements IGameObject {
   rotating = false;
   scale: number;
   constructor(
-    private game: Game,
     private playerProps: {
       scale: number;
       color: string;
-      isAi: boolean;
-      spaceShipRenderIndex: number;
-      playerId: number;
       x: number;
       y: number;
     }
@@ -60,7 +56,6 @@ class Player implements IGameObject {
       this.sprite.update(dt);
     }
     this.updateEngineEffect(dt);
-    this.wallCollision();
     this.updateDeadPlayer();
   }
   render(): void {
@@ -88,19 +83,6 @@ class Player implements IGameObject {
   onHitWall({ go }: { go: IGameObject }) {
     if (go === this) {
       this.setPlayerState(PlayerState.dead);
-    }
-  }
-
-  wallCollision() {
-    if (
-      this.playerState === PlayerState.tracing &&
-      isOutOfBounds(this.game, this.sprite)
-    ) {
-      const point: Vector = Vector(this.sprite.x, this.sprite.y);
-      emit(GameEvent.hitWall, {
-        point: point,
-        go: this.sprite,
-      });
     }
   }
 
