@@ -11,6 +11,7 @@ import { SpaceShip } from './spaceShip';
 
 class Player implements IGameObject {
   sprite: Sprite;
+  dummy: Sprite;
   spaceShip: SpaceShip;
   playerState: PlayerState = PlayerState.idle;
   speed: number;
@@ -47,20 +48,20 @@ class Player implements IGameObject {
     on(GameEvent.gameOver, (evt: any) => this.onGameOver(evt));
     on(MonetizeEvent.progress, this.onMonetizeProgress);
 
-    this.spaceShip.sprite$().subscribe((sprite) => {
+    this.spaceShip.sprite$().subscribe(({ sprite }) => {
       this.sprite = sprite;
     });
   }
   update(dt: number): void {
-    if (this.sprite) {
-      this.sprite.update(dt);
+    if (this.spaceShip) {
+      this.spaceShip.update(dt);
     }
     this.updateEngineEffect(dt);
     this.updateDeadPlayer();
   }
   render(): void {
-    if (this.sprite) {
-      this.sprite.render();
+    if (this.spaceShip) {
+      this.spaceShip.render();
     }
     this.effect.render();
     this.renderDeadPlayer();

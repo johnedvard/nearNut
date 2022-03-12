@@ -76,7 +76,7 @@ export class Game {
     this.ctx.imageSmoothingEnabled = false;
     this.canvas.height = tileEngine.mapheight * this.scale;
     this.canvas.width = tileEngine.mapwidth * this.scale;
-    this.ctx.scale(this.scale, this.scale);
+    // this.ctx.scale(this.scale, this.scale);
 
     this.tileEngine = tileEngine;
     this.loop = GameLoop({
