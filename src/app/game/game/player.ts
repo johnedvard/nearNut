@@ -3,7 +3,7 @@ import { MonetizeEvent } from 'src/app/shared/monetizeEvent';
 import { Game } from './game';
 import { getPlayerControls, isOutOfBounds } from './gameUtils';
 import { EngineParticleEffect } from './engineParticleEffect';
-import { emit, on, Sprite, Vector } from 'kontra';
+import { emit, off, on, Sprite, Vector } from 'kontra';
 import { IGameObject } from './iGameObject';
 import { PlayerState } from './playerState';
 import { GameEvent } from './gameEvent';
@@ -14,20 +14,16 @@ class Player implements IGameObject {
   dummy: Sprite;
   spaceShip: SpaceShip;
   playerState: PlayerState = PlayerState.idle;
-  speed: number;
+  speed = 100;
   effect: EngineParticleEffect;
   rotating = false;
-  scale: number;
   constructor(
     private playerProps: {
-      scale: number;
       color: string;
       x: number;
       y: number;
     }
   ) {
-    this.scale = this.playerProps.scale || 1;
-    this.speed = 100 * this.scale;
     const spriteProps = {
       x: this.playerProps.x || 0,
       y: this.playerProps.y || 0,
@@ -35,7 +31,6 @@ class Player implements IGameObject {
     };
     const [leftKey, rightKey] = getPlayerControls();
     this.spaceShip = new SpaceShip(this.playerState, {
-      scale: this.scale,
       spriteProps,
       isPreview: false,
       rightKey,
@@ -43,15 +38,23 @@ class Player implements IGameObject {
     });
     this.effect = new EngineParticleEffect();
 
-    on(GameEvent.startTrace, () => this.onStartTrace());
-    on(GameEvent.hitWall, (evt: any) => this.onHitWall(evt));
-    on(GameEvent.gameOver, (evt: any) => this.onGameOver(evt));
+    on(GameEvent.startTrace, this.onStartTrace);
+    on(GameEvent.hitWall, this.onHitWall);
+    on(GameEvent.gameOver, this.onGameOver);
     on(MonetizeEvent.progress, this.onMonetizeProgress);
 
     this.spaceShip.sprite$().subscribe(({ sprite }) => {
       this.sprite = sprite;
     });
   }
+
+  cleanup(): void {
+    off(GameEvent.startTrace, this.onStartTrace);
+    off(GameEvent.hitWall, this.onHitWall);
+    off(GameEvent.gameOver, this.onGameOver);
+    off(MonetizeEvent.progress, this.onMonetizeProgress);
+  }
+
   update(dt: number): void {
     if (this.spaceShip) {
       this.spaceShip.update(dt);
@@ -67,25 +70,25 @@ class Player implements IGameObject {
     this.renderDeadPlayer();
   }
 
-  onStartTrace() {
+  onStartTrace = () => {
     this.sprite.dx = this.speed;
     this.sprite.dy = this.speed;
     this.setPlayerState(PlayerState.tracing);
-  }
+  };
 
   onMonetizeProgress() {}
 
-  onGameOver(props: { winner: Player }) {
+  onGameOver = (props: { winner: Player }) => {
     if (props.winner === this) {
       this.setPlayerState(PlayerState.idle);
     }
-  }
+  };
 
-  onHitWall({ go }: { go: IGameObject }) {
+  onHitWall = ({ go }: { go: IGameObject }) => {
     if (go === this) {
       this.setPlayerState(PlayerState.dead);
     }
-  }
+  };
 
   updateDeadPlayer() {
     if (this.playerState === PlayerState.dead) {

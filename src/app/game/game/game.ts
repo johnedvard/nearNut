@@ -8,6 +8,7 @@ import {
   emit,
   onKey,
   on,
+  off,
 } from 'kontra';
 import { GameEvent } from './gameEvent';
 import { GameState } from './gameState';
@@ -27,7 +28,7 @@ import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 
 export class Game {
   private state: GameState = GameState.loading;
-  scale = 4;
+  scale = 4 * window.devicePixelRatio;
   canvas: HTMLCanvasElement;
   gameObjects: GameObjects;
   gos: IGameObject[] = [];
@@ -63,9 +64,19 @@ export class Game {
       });
     }
 
-    on(GameEvent.startGame, () => this.onStartGame());
-    on(GameEvent.playerStateChange, (evt) => this.onPlayerStateChange(evt));
-    on(GameEvent.levelComplete, () => this.onLevelComplete());
+    on(GameEvent.startGame, this.onStartGame);
+    on(GameEvent.playerStateChange, this.onPlayerStateChange);
+    on(GameEvent.levelComplete, this.onLevelComplete);
+  }
+
+  cleanup() {
+    off(GameEvent.startGame, this.onStartGame);
+    off(GameEvent.playerStateChange, this.onPlayerStateChange);
+    off(GameEvent.levelComplete, this.onLevelComplete);
+    this.player.cleanup();
+    this.goal.cleanup();
+    this.goalSwitch.cleanup();
+    this.gos.forEach((go) => go.cleanup());
   }
 
   initGameLoop({ tileEngine, gameObjects }) {
@@ -73,14 +84,9 @@ export class Game {
     this.setState(GameState.ready);
     this.initGame(gameObjects);
     this.initKeyBindings();
-    this.canvas.height =
-      tileEngine.mapheight * this.scale * window.devicePixelRatio;
-    this.canvas.width =
-      tileEngine.mapwidth * this.scale * window.devicePixelRatio;
-    this.ctx.scale(
-      this.scale * window.devicePixelRatio,
-      this.scale * window.devicePixelRatio
-    );
+    this.canvas.height = tileEngine.mapheight * this.scale;
+    this.canvas.width = tileEngine.mapwidth * this.scale;
+    this.ctx.scale(this.scale, this.scale);
 
     this.tileEngine = tileEngine;
     this.loop = GameLoop({
@@ -118,24 +124,24 @@ export class Game {
     this.initGoalSwitch(gameObjects.goalSwitch);
   }
 
-  onLevelComplete() {
+  onLevelComplete = () => {
     console.log('level complete');
     this.setState(GameState.gameOver);
     this.resetGame();
     // TODO (johnedvard)
     // save state
     // go to level selector? Go to next level?
-  }
-  onStartGame() {
+  };
+  onStartGame = () => {
     this.setState(GameState.inProgress);
     emit(GameEvent.startTrace, {});
-  }
+  };
 
-  onPlayerStateChange(evt: PlayerStateChangeEvent) {
+  onPlayerStateChange = (evt: PlayerStateChangeEvent) => {
     if (evt?.state === PlayerState.dead) {
       this.setState(GameState.gameOver);
     }
-  }
+  };
 
   checkTileMapCollision(go: IGameObject) {
     if (this.tileEngine && go.sprite) {
@@ -172,7 +178,6 @@ export class Game {
 
   initPlayer({ x, y }) {
     this.player = new Player({
-      scale: 1,
       color: '#00ff00',
       x: x,
       y: y,

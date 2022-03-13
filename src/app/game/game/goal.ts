@@ -1,4 +1,4 @@
-import { emit, load, on, Sprite, SpriteSheet } from 'kontra';
+import { emit, load, off, on, Sprite, SpriteSheet } from 'kontra';
 import { GameEvent } from './gameEvent';
 import { GoalState } from './goalState';
 import { IGameObject } from './iGameObject';
@@ -12,14 +12,19 @@ export class Goal implements IGameObject {
 
   constructor({ x, y }) {
     this.initGoal({ x, y });
-    on(GameEvent.openGoal, () => this.onGoalOpen());
-    on(GameEvent.goalCollision, (evt) => this.onGoalCollision(evt));
+    on(GameEvent.openGoal, this.onGoalOpen);
+    on(GameEvent.goalCollision, this.onGoalCollision);
   }
 
-  onGoalOpen() {
-    this.setState(GoalState.opening);
+  cleanup(): void {
+    off(GameEvent.openGoal, this.onGoalOpen);
+    off(GameEvent.goalCollision, this.onGoalCollision);
   }
-  onGoalCollision({ other }) {
+
+  onGoalOpen = () => {
+    this.setState(GoalState.opening);
+  };
+  onGoalCollision = ({ other }) => {
     if (other instanceof Player) {
       switch (this.state) {
         case GoalState.opened:
@@ -31,7 +36,7 @@ export class Goal implements IGameObject {
         default:
       }
     }
-  }
+  };
 
   setState(state: GoalState) {
     console.log('set state', state);

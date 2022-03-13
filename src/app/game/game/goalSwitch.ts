@@ -1,4 +1,4 @@
-import { emit, load, on, Sprite, SpriteSheet } from 'kontra';
+import { emit, load, off, on, Sprite, SpriteSheet } from 'kontra';
 import { GameEvent } from './gameEvent';
 import { GoalSwitchState } from './goalSwitchState';
 import { IGameObject } from './iGameObject';
@@ -12,14 +12,17 @@ export class GoalSwitch implements IGameObject {
 
   constructor({ x, y }) {
     this.initGoalSwitch({ x, y });
-    on(GameEvent.goalSwitchCollision, (evt) => this.onGoalSwitchCollision(evt));
+    on(GameEvent.goalSwitchCollision, this.onGoalSwitchCollision);
   }
 
-  onGoalSwitchCollision({ other }) {
+  cleanup(): void {
+    off(GameEvent.goalSwitchCollision, this.onGoalSwitchCollision);
+  }
+  onGoalSwitchCollision = ({ other }) => {
     if (other instanceof Player) {
       this.setState(GoalSwitchState.collected);
     }
-  }
+  };
 
   setState(state: GoalSwitchState) {
     if (this.state !== state) {

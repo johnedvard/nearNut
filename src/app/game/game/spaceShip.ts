@@ -1,4 +1,4 @@
-import { init, keyPressed, load, on, Sprite, SpriteSheet } from 'kontra';
+import { init, keyPressed, load, off, on, Sprite, SpriteSheet } from 'kontra';
 import { Observable, Subject } from 'rxjs';
 import { MonetizeEvent } from 'src/app/shared/monetizeEvent';
 
@@ -11,7 +11,6 @@ import { spaceShipRenderers } from './spaceShipRenderers';
 export class SpaceShip implements IGameObject {
   ANIMATION_TRACING = 'tracing';
   sprite: Sprite;
-  scale = 1;
   rightKey = 'right';
   leftKey = 'left';
   weaponKey = 'up';
@@ -23,7 +22,6 @@ export class SpaceShip implements IGameObject {
   constructor(
     private playerState: PlayerState,
     props: {
-      scale: number;
       spriteProps: any;
       isPreview: boolean;
       leftKey?: string;
@@ -31,16 +29,18 @@ export class SpaceShip implements IGameObject {
       weaponKey?: string;
     }
   ) {
-    this.scale = props.scale;
     this.rightKey = props.rightKey || this.rightKey;
     this.leftKey = props.leftKey || this.leftKey;
     this.weaponKey = props.weaponKey || this.weaponKey;
 
     this.initSpaceShip(props.spriteProps);
-    on(GameEvent.playerStateChange, (evt: any) =>
-      this.onPlayerStateChange(evt)
-    );
-    on(MonetizeEvent.progress, () => this.onMonetizeProgress());
+    on(GameEvent.playerStateChange, this.onPlayerStateChange);
+    on(MonetizeEvent.progress, this.onMonetizeProgress);
+  }
+
+  cleanup(): void {
+    off(GameEvent.playerStateChange, this.onPlayerStateChange);
+    off(MonetizeEvent.progress, this.onMonetizeProgress);
   }
 
   update(dt: number): void {
@@ -75,8 +75,6 @@ export class SpaceShip implements IGameObject {
       this.sprite = Sprite({
         x: x,
         y: y,
-        scaleX: this.scale,
-        scaleY: this.scale,
         height: 16,
         width: 16,
         anchor: { x: 0.5, y: 0.5 },
@@ -111,15 +109,15 @@ export class SpaceShip implements IGameObject {
     return this.spaceShipSubject.asObservable();
   }
 
-  onMonetizeProgress() {
+  onMonetizeProgress = () => {
     this.isSubscriber = true;
-  }
+  };
 
-  onPlayerStateChange(evt: PlayerStateChangeEvent) {
+  onPlayerStateChange = (evt: PlayerStateChangeEvent) => {
     if (evt.ship === this) {
       this.playerState = evt.state;
     }
-  }
+  };
 
   renderSpaceShip(sprite: Sprite, isSubscriber = false) {
     if (this.playerState !== PlayerState.dead) {

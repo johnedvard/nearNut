@@ -5,7 +5,7 @@ import { IGameObject } from './iGameObject';
 import { ILevelData } from './iLevelData';
 
 export class LevelEditor {
-  scale = 1;
+  scale = 2 * window.devicePixelRatio;
   gos: IGameObject[] = [];
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -22,6 +22,7 @@ export class LevelEditor {
       });
     }
   }
+  cleanup() {}
 
   renderGrid({ tilewidth, tileheight, mapwidth, mapheight }) {
     const ctx = this.ctx;
@@ -44,7 +45,6 @@ export class LevelEditor {
     console.log(tileEngine);
     const mapheight = tileEngine.mapheight * this.scale;
     const mapwidth = tileEngine.mapwidth * this.scale;
-    this.ctx.imageSmoothingEnabled = false;
     this.canvas.height = mapheight;
     this.canvas.width = mapwidth;
     this.ctx.scale(this.scale, this.scale);
@@ -61,6 +61,9 @@ export class LevelEditor {
         });
       },
       render: () => {
+        if (this.ctx.imageSmoothingEnabled) {
+          this.ctx.imageSmoothingEnabled = false;
+        }
         this.gos.forEach((go) => {
           go.render();
         });

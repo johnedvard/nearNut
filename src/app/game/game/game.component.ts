@@ -8,7 +8,7 @@ import { LevelEditor } from './levelEditor';
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.sass'],
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, OnDestroy {
   @Input() level: ILevelData;
   @Input() isEditing = false;
   game: Game;
@@ -20,6 +20,13 @@ export class GameComponent implements OnInit {
       this.levelEditor = new LevelEditor(this.level);
     } else {
       this.game = new Game();
+    }
+  }
+  ngOnDestroy(): void {
+    if (this.isEditing) {
+      this.levelEditor.cleanup();
+    } else {
+      this.game.cleanup();
     }
   }
 }

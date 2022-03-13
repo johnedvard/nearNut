@@ -29,6 +29,7 @@ export class EngineParticleEffect implements IGameObject {
       },
     });
   }
+  cleanup(): void {}
   updatePool(dt: number) {
     const rotation = this.rotation;
 
