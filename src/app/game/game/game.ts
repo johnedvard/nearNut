@@ -27,7 +27,7 @@ import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 
 export class Game {
   private state: GameState = GameState.loading;
-  scale = 1;
+  scale = 4;
   canvas: HTMLCanvasElement;
   gameObjects: GameObjects;
   gos: IGameObject[] = [];
@@ -73,10 +73,14 @@ export class Game {
     this.setState(GameState.ready);
     this.initGame(gameObjects);
     this.initKeyBindings();
-    this.ctx.imageSmoothingEnabled = false;
-    this.canvas.height = tileEngine.mapheight * this.scale;
-    this.canvas.width = tileEngine.mapwidth * this.scale;
-    // this.ctx.scale(this.scale, this.scale);
+    this.canvas.height =
+      tileEngine.mapheight * this.scale * window.devicePixelRatio;
+    this.canvas.width =
+      tileEngine.mapwidth * this.scale * window.devicePixelRatio;
+    this.ctx.scale(
+      this.scale * window.devicePixelRatio,
+      this.scale * window.devicePixelRatio
+    );
 
     this.tileEngine = tileEngine;
     this.loop = GameLoop({
@@ -92,6 +96,9 @@ export class Game {
         this.checkGoalCollision(this.player);
       },
       render: () => {
+        if (this.ctx.imageSmoothingEnabled) {
+          this.ctx.imageSmoothingEnabled = false;
+        }
         this.player.render();
         this.goal.render();
         this.goalSwitch.render();

@@ -11,7 +11,6 @@ import { spaceShipRenderers } from './spaceShipRenderers';
 export class SpaceShip implements IGameObject {
   ANIMATION_TRACING = 'tracing';
   sprite: Sprite;
-  canvasDummy: Sprite;
   scale = 1;
   rightKey = 'right';
   leftKey = 'left';
@@ -48,37 +47,14 @@ export class SpaceShip implements IGameObject {
     if (this.sprite) {
       this.sprite.update(dt);
     }
-    if (this.canvasDummy) {
-      this.canvasDummy.update(dt);
-    }
   }
   render(): void {
     if (this.sprite) {
       this.sprite.render();
     }
-    if (this.canvasDummy) {
-      this.canvasDummy.render();
-    }
   }
 
   initSpaceShip({ x, y, color }) {
-    let canvasEl: HTMLCanvasElement;
-    if (document.getElementById('player')) {
-      canvasEl = <HTMLCanvasElement>document.getElementById('player');
-    } else {
-      canvasEl = <HTMLCanvasElement>document.createElement('canvas');
-      canvasEl.setAttribute('id', 'player');
-      document.getElementById('game').parentNode.appendChild(canvasEl);
-    }
-    canvasEl.style['position'] = 'absolute';
-    canvasEl.style['background'] = '';
-    canvasEl.style['top'] = '-8.5px';
-    canvasEl.style['left'] = '-8.5px';
-    canvasEl.style['image-rendering'] = 'pixelated';
-    canvasEl.width = 16;
-    canvasEl.height = 16;
-    const ctx = canvasEl.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
     const spaceShip = this;
     const rotationSpeed = 5;
     load(
@@ -101,13 +77,13 @@ export class SpaceShip implements IGameObject {
         y: y,
         scaleX: this.scale,
         scaleY: this.scale,
-        height: 10,
-        width: 10,
+        height: 16,
+        width: 16,
         anchor: { x: 0.5, y: 0.5 },
-        // animations: spriteSheet.animations,
+        animations: spriteSheet.animations,
         update: function (dt: number) {
           if (!this) return;
-          // this.currentAnimation.update(dt); // To draw animation
+          this.currentAnimation.update(dt); // To draw animation
           this.rotation = this.rotation || 0;
           if (keyPressed(spaceShip.leftKey)) {
             this.rotation -= rotationSpeed * dt;
@@ -122,20 +98,9 @@ export class SpaceShip implements IGameObject {
           // move the ship forward in the direction it's facing
           this.x = this.x + this.dx * dt * Math.cos(this.rotation);
           this.y = this.y + this.dy * dt * Math.sin(this.rotation);
-          canvasEl.style[
-            'transform'
-          ] = `translate3d(${this.x}px,${this.y}px,0) rotate(${this.rotation}rad)`;
         },
       });
 
-      this.canvasDummy = Sprite({
-        animations: spriteSheet.animations,
-        context: ctx,
-        update: function (dt: number) {
-          if (!this) return;
-          this.currentAnimation.update(dt);
-        },
-      });
       this.spaceShipSubject.next({
         sprite: this.sprite,
       });
