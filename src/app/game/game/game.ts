@@ -28,7 +28,7 @@ import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 
 export class Game {
   private state: GameState = GameState.loading;
-  scale = 4 * window.devicePixelRatio;
+  scale = 2 * window.devicePixelRatio;
   canvas: HTMLCanvasElement;
   gameObjects: GameObjects;
   gos: IGameObject[] = [];

@@ -17,8 +17,9 @@ import { ILevelData } from './iLevelData';
 
 export class LevelEditor {
   isAltDragging = false;
-  altDragStartPos = 0;
+  altDragStartPos = { x: 0, y: 0 };
   currTileEngineSx = 0;
+  currTileEngineSy = 0;
   scale = 2 * window.devicePixelRatio;
   gos: IGameObject[] = [];
   canvas: HTMLCanvasElement;
@@ -48,11 +49,11 @@ export class LevelEditor {
   };
 
   onPointerDown = (e, object) => {
-    console.log(e);
     if (keyPressed('alt')) {
       // TODO (johnedvard) Move dragging functinoality to another class/file
       this.currTileEngineSx = this.tileEngine.sx;
-      this.altDragStartPos = e.offsetX;
+      this.currTileEngineSy = this.tileEngine.sy;
+      this.altDragStartPos = { x: e.offsetX, y: e.offsetY };
       this.isAltDragging = true;
     }
   };
@@ -94,7 +95,7 @@ export class LevelEditor {
     // hack to fake tilengine width and height, making it possible to move the camera
     tileEngine.mapwidth = mapwidth;
     tileEngine.mapheight = mapheight;
-    this.canvas.height = mapheight;
+    this.canvas.height = mapheight - tileEngine.tileheight * 2 * this.scale;
     this.canvas.width = mapwidth - tileEngine.tilewidth * 3 * this.scale;
     this.ctx.scale(this.scale, this.scale);
     this.maxSx = (mapwidth - this.canvas.width) / this.scale;
@@ -137,7 +138,15 @@ export class LevelEditor {
   checkMousePointer() {
     if (this.isAltDragging) {
       const p = getPointer();
-      const sx = this.currTileEngineSx + (p.x - this.altDragStartPos) * -1;
+      const sx = this.currTileEngineSx + (p.x - this.altDragStartPos.x) * -1;
+      const sy = this.currTileEngineSy + (p.y - this.altDragStartPos.y) * -1;
+      if (sy <= 0) {
+        this.tileEngine.sy = 0;
+      } else if (sy >= this.maxSy) {
+        this.tileEngine.sy = this.maxSy;
+      } else {
+        this.tileEngine.sy = sy;
+      }
 
       if (sx <= 0) {
         this.tileEngine.sx = 0;
