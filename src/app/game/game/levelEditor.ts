@@ -20,7 +20,8 @@ export class LevelEditor {
   altDragStartPos = { x: 0, y: 0 };
   currTileEngineSx = 0;
   currTileEngineSy = 0;
-  scale = 2 * window.devicePixelRatio;
+  //scale = 2 * window.devicePixelRatio;
+  scale = 2;
   gos: IGameObject[] = [];
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -104,13 +105,13 @@ export class LevelEditor {
   }
   initEditorLoop({ tileEngine, gameObjects }) {
     this.tileEngine = tileEngine;
-    const mapheight = tileEngine.mapheight * this.scale;
-    const mapwidth = tileEngine.mapwidth * this.scale;
+    const mapheight = 600;
+    const mapwidth = 800;
     // hack to fake tilengine width and height, making it possible to move the camera
     tileEngine.mapwidth = mapwidth;
     tileEngine.mapheight = mapheight;
-    this.canvas.height = tileEngine.tileheight * 20 * this.scale;
-    this.canvas.width = tileEngine.tilewidth * 20 * this.scale;
+    this.canvas.height = 600;
+    this.canvas.width = 800;
     this.ctx.scale(this.scale, this.scale);
     this.setMaxSxSy({ mapwidth, mapheight });
 
