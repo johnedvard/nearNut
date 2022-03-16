@@ -56,6 +56,9 @@ export class EditorControls {
         break;
     }
   }
+  /**
+   * Also draws adjecent tiles
+   */
   drawTile() {
     const layerName = 'ground';
     const p = getPointer();
@@ -74,16 +77,33 @@ export class EditorControls {
     if (this.currCol !== col || this.currRow != row) {
       this.currCol = col;
       this.currRow = row;
-      // Check neighbours
 
-      console.log('col', col);
-      console.log('row', row);
+      // TODO (johnedvard) Expand tilemap if out of bounds
+      // Check neighbours and draw correct tile
+      const adjacentTiles = this.getAdjecentTiles({ layerName, col, row });
+      console.log(adjacentTiles);
+      // No need to shrink map while editing
+
       // const aTile = this.tileEngine.tileAtLayer(layerName, { x, y });
       // this.tileEngine.setTileAtLayer(layerName, { col, row }, tile);
 
       // console.log(this.tileEngine);
       // console.log(aTile);
     }
+  }
+  getAdjecentTiles({ col, row, layerName }) {
+    const tileAt = ({ row, col }) =>
+      this.tileEngine.tileAtLayer(layerName, { row, col });
+    return {
+      nw: tileAt({ row: row - 1, col: col - 1 }),
+      n: tileAt({ row: row - 1, col }),
+      ne: tileAt({ row: row - 1, col: col + 1 }),
+      e: tileAt({ row, col: col + 1 }),
+      se: tileAt({ row: row + 1, col: col + 1 }),
+      s: tileAt({ row: row + 1, col }),
+      sw: tileAt({ row: row + 1, col: col - 1 }),
+      w: tileAt({ row, col: col - 1 }),
+    };
   }
   erase() {}
 
