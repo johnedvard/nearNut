@@ -88,6 +88,20 @@ export class LevelEditor {
     ctx.stroke();
   }
 
+  changeTilemapSize({ row, col }) {
+    // TODO (johnedvard) make it possible to add columns above and left of canvas
+    this.tileEngine.mapwidth += col * this.tileEngine.tilewidth * this.scale;
+    this.tileEngine.mapheight += row * this.tileEngine.tileheight * this.scale;
+    this.setMaxSxSy({
+      mapwidth: this.tileEngine.mapwidth,
+      mapheight: this.tileEngine.mapheight,
+    });
+  }
+
+  setMaxSxSy({ mapwidth, mapheight }) {
+    this.maxSx = Math.max(0, (mapwidth - this.canvas.width) / this.scale);
+    this.maxSy = Math.max(0, (mapheight - this.canvas.height) / this.scale);
+  }
   initEditorLoop({ tileEngine, gameObjects }) {
     this.tileEngine = tileEngine;
     const mapheight = tileEngine.mapheight * this.scale;
@@ -95,11 +109,10 @@ export class LevelEditor {
     // hack to fake tilengine width and height, making it possible to move the camera
     tileEngine.mapwidth = mapwidth;
     tileEngine.mapheight = mapheight;
-    this.canvas.height = mapheight - tileEngine.tileheight * 2 * this.scale;
-    this.canvas.width = mapwidth - tileEngine.tilewidth * 3 * this.scale;
+    this.canvas.height = tileEngine.tileheight * 20 * this.scale;
+    this.canvas.width = tileEngine.tilewidth * 20 * this.scale;
     this.ctx.scale(this.scale, this.scale);
-    this.maxSx = (mapwidth - this.canvas.width) / this.scale;
-    this.maxSy = (mapheight - this.canvas.height) / this.scale;
+    this.setMaxSxSy({ mapwidth, mapheight });
 
     for (const key in gameObjects) {
       if (gameObjects.hasOwnProperty(key)) {
@@ -140,23 +153,28 @@ export class LevelEditor {
       const p = getPointer();
       const sx = this.currTileEngineSx + (p.x - this.altDragStartPos.x) * -1;
       const sy = this.currTileEngineSy + (p.y - this.altDragStartPos.y) * -1;
-      if (sy <= 0) {
-        this.tileEngine.sy = 0;
-      } else if (sy >= this.maxSy) {
-        this.tileEngine.sy = this.maxSy;
-      } else {
-        this.tileEngine.sy = sy;
+      this.panCamera({ sx, sy });
+      if (sx >= this.maxSx) {
+        this.changeTilemapSize({ row: 0, col: 1 });
       }
-
-      if (sx <= 0) {
-        this.tileEngine.sx = 0;
-      } else if (sx >= this.maxSx) {
-        this.tileEngine.sx = this.maxSx;
-      } else {
-        this.tileEngine.sx = sx;
+      if (sy >= this.maxSy) {
+        this.changeTilemapSize({ row: 1, col: 0 });
       }
-      getPointer();
     }
+  }
+  panCamera({ sx, sy }) {
+    const pan = (key: string, value: number, max: number) => {
+      if (max === 0) return;
+      if (value <= 0) {
+        this.tileEngine[key] = 0;
+      } else if (value >= max) {
+        this.tileEngine[key] = max;
+      } else {
+        this.tileEngine[key] = value;
+      }
+    };
+    pan('sy', sy, this.maxSy);
+    pan('sx', sx, this.maxSx);
   }
   extendKeys() {
     keyMap['AltLeft'] = 'alt';
