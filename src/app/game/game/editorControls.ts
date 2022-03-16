@@ -1,27 +1,32 @@
-import {
-  getPointer,
-  keyMap,
-  keyPressed,
-  offPointer,
-  onPointer,
-  TileEngine,
-} from 'kontra';
-
+import { getPointer, offPointer, onPointer, TileEngine } from 'kontra';
+import { getCol, getRow } from './gameUtils';
+type PointerState = 'panning' | 'idle' | 'drawing' | 'erasing';
+type Tool = 'block';
+type Brush = 'main';
 export class EditorControls {
+  PRIMARY_BUTTON = 0;
+  AUXILIARY_BUTTON = 1;
+  SECONDARY_BUTTON = 2;
+  BACK_BUTTON = 3;
+  FORWARD_BUTTON = 4;
   scale: number;
-  isAltDragging = false;
+  pointerState: PointerState = 'panning';
+  selectedTool: Tool = 'block';
+  selectedBrush: Brush = 'main';
   altDragStartPos = { x: 0, y: 0 };
   currTileEngineSx = 0;
   currTileEngineSy = 0;
   maxSx = 0; // number of mapwidth pixels not inside the canvas
   maxSy = 0; // number of mapheight pixels not inside the canvas
+
+  currCol = 0;
+  currRow = 0;
   constructor(
     private canvas: HTMLCanvasElement,
     private tileEngine: TileEngine,
     { scale }
   ) {
     this.scale = scale;
-    this.extendKeys();
     onPointer('down', this.onPointerDown);
     onPointer('up', this.onPointerUp);
     this.setMaxSxSy({
@@ -30,17 +35,73 @@ export class EditorControls {
     });
   }
 
+  update() {
+    switch (this.pointerState) {
+      case 'panning':
+        this.doPanning();
+        break;
+      case 'drawing':
+        this.draw();
+        break;
+      case 'erasing':
+        this.erase();
+        break;
+      default:
+    }
+  }
+  draw() {
+    switch (this.selectedBrush) {
+      case 'main':
+        this.drawTile();
+        break;
+    }
+  }
+  drawTile() {
+    const layerName = 'ground';
+    const p = getPointer();
+    const row = getRow(
+      p.y,
+      this.tileEngine.tileheight,
+      this.scale,
+      this.tileEngine.sy
+    );
+    const col = getCol(
+      p.x,
+      this.tileEngine.tilewidth,
+      this.scale,
+      this.tileEngine.sx
+    );
+    if (this.currCol !== col || this.currRow != row) {
+      this.currCol = col;
+      this.currRow = row;
+      // Check neighbours
+
+      console.log('col', col);
+      console.log('row', row);
+      // const aTile = this.tileEngine.tileAtLayer(layerName, { x, y });
+      // this.tileEngine.setTileAtLayer(layerName, { col, row }, tile);
+
+      // console.log(this.tileEngine);
+      // console.log(aTile);
+    }
+  }
+  erase() {}
+
   onPointerUp = (e, obejct) => {
-    this.isAltDragging = false;
+    this.setPointerState('idle');
   };
 
   onPointerDown = (e, object) => {
-    if (keyPressed('alt')) {
-      // TODO (johnedvard) Move dragging functinoality to another class/file
+    console.log(e);
+    if (e.altKey && e.button === this.PRIMARY_BUTTON) {
+      this.setPointerState('panning');
       this.currTileEngineSx = this.tileEngine.sx;
       this.currTileEngineSy = this.tileEngine.sy;
       this.altDragStartPos = { x: e.offsetX, y: e.offsetY };
-      this.isAltDragging = true;
+    } else if (e.button === this.PRIMARY_BUTTON) {
+      this.setPointerState('drawing');
+    } else if (e.button === this.SECONDARY_BUTTON) {
+      this.setPointerState('erasing');
     }
   };
 
@@ -74,26 +135,23 @@ export class EditorControls {
     this.maxSy = Math.max(0, (mapheight - this.canvas.height) / this.scale);
   }
 
-  checkMousePointer() {
-    if (this.isAltDragging) {
-      const p = getPointer();
-      const sx = this.currTileEngineSx + (p.x - this.altDragStartPos.x) * -1;
-      const sy = this.currTileEngineSy + (p.y - this.altDragStartPos.y) * -1;
-      this.panCamera({ sx, sy });
-      if (sx >= this.maxSx) {
-        this.changeTilemapSize({ row: 0, col: 1 });
-      }
-      if (sy >= this.maxSy) {
-        this.changeTilemapSize({ row: 1, col: 0 });
-      }
+  setPointerState(state: PointerState) {
+    this.pointerState = state;
+  }
+
+  doPanning() {
+    const p = getPointer();
+    const sx = this.currTileEngineSx + (p.x - this.altDragStartPos.x) * -1;
+    const sy = this.currTileEngineSy + (p.y - this.altDragStartPos.y) * -1;
+    this.panCamera({ sx, sy });
+    if (sx >= this.maxSx) {
+      this.changeTilemapSize({ row: 0, col: 1 });
+    }
+    if (sy >= this.maxSy) {
+      this.changeTilemapSize({ row: 1, col: 0 });
     }
   }
-  update() {
-    this.checkMousePointer();
-  }
-  extendKeys() {
-    keyMap['AltLeft'] = 'alt';
-  }
+
   cleanup() {
     offPointer('down');
     offPointer('up');

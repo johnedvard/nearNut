@@ -57,3 +57,10 @@ export const loadLevelFromFile = (
     return { tileEngine, gameObjects: assets[1].gameObjects };
   });
 };
+
+export const getRow = (y, tileheight, scale, sy) => {
+  return ((y + sy) / (tileheight * scale)) | 0;
+};
+export const getCol = (x, tilewidth, scale, sx) => {
+  return ((x + sx) / (tilewidth * scale)) | 0;
+};

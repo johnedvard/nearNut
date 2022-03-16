@@ -16,6 +16,9 @@ export class LevelEditor {
   constructor(level: ILevelData) {
     const id = 'game';
     const { canvas } = init(id);
+    canvas.oncontextmenu = function (e) {
+      e.preventDefault();
+    };
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     initKeys();
