@@ -1,5 +1,6 @@
 import { getPointer, offPointer, onPointer, TileEngine } from 'kontra';
 import { getCol, getRow } from './gameUtils';
+import { MainBlockType } from './mainBlockType';
 type PointerState = 'panning' | 'idle' | 'drawing' | 'erasing';
 type Tool = 'block';
 type Brush = 'main';
@@ -80,8 +81,9 @@ export class EditorControls {
 
       // TODO (johnedvard) Expand tilemap if out of bounds
       // Check neighbours and draw correct tile
-      const adjacentTiles = this.getAdjecentTiles({ layerName, col, row });
+      const adjacentTiles = this.getAdjecentTiles({ col, row, layerName });
       console.log(adjacentTiles);
+      this.setAdjacentTiles(adjacentTiles, { col, row, layerName });
       // No need to shrink map while editing
 
       // const aTile = this.tileEngine.tileAtLayer(layerName, { x, y });
@@ -94,17 +96,43 @@ export class EditorControls {
   getAdjecentTiles({ col, row, layerName }) {
     const tileAt = ({ row, col }) =>
       this.tileEngine.tileAtLayer(layerName, { row, col });
+    const nwCoord = { row: row - 1, col: col - 1 };
+    const nCoord = { row: row - 1, col };
+    const neCoord = { row: row - 1, col: col + 1 };
+    const eCoord = { row, col: col + 1 };
+    const seCoord = { row: row + 1, col: col + 1 };
+    const sCoord = { row: row + 1, col };
+    const swCoord = { row: row + 1, col: col - 1 };
+    const wCoord = { row, col: col - 1 };
     return {
-      nw: tileAt({ row: row - 1, col: col - 1 }),
-      n: tileAt({ row: row - 1, col }),
-      ne: tileAt({ row: row - 1, col: col + 1 }),
-      e: tileAt({ row, col: col + 1 }),
-      se: tileAt({ row: row + 1, col: col + 1 }),
-      s: tileAt({ row: row + 1, col }),
-      sw: tileAt({ row: row + 1, col: col - 1 }),
-      w: tileAt({ row, col: col - 1 }),
+      nw: { tile: tileAt({ ...nwCoord }), ...nwCoord },
+      n: { tile: tileAt({ ...nCoord }), ...nCoord },
+      ne: { tile: tileAt({ ...neCoord }), ...neCoord },
+      e: { tile: tileAt({ ...eCoord }), ...eCoord },
+      se: { tile: tileAt({ ...seCoord }), ...seCoord },
+      s: { tile: tileAt({ ...sCoord }), ...sCoord },
+      sw: { tile: tileAt({ ...swCoord }), ...swCoord },
+      w: { tile: tileAt({ ...wCoord }), ...wCoord },
     };
   }
+  setAdjacentTiles(adjacentTiles, { col, row, layerName }) {
+    Object.entries(adjacentTiles).forEach(
+      ([key, value]: [string, { tile: number; row: number; col: number }]) => {
+        console.log('key', key, MainBlockType[key as keyof MainBlockType]);
+        console.log('value', value);
+        if (this.canOverrideTile({ tile: value.tile })) {
+          this.tileEngine.setTileAtLayer(
+            layerName,
+            { col: value.col, row: value.row },
+            MainBlockType[key as keyof MainBlockType]
+          );
+        }
+      }
+    );
+  }
+  canOverrideTile = ({ tile }) => {
+    return !!(tile !== 0);
+  };
   erase() {}
 
   onPointerUp = (e, obejct) => {
