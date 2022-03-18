@@ -32,6 +32,7 @@
     <app-game [level]="selectedLevel"></app-game>
   </div>
   <div *ngIf="state === 'editing'">
+    <app-level-toolbar> </app-level-toolbar>
     <button mat-button (click)="goBackToSelection()">Back</button>
     <app-game [level]="selectedLevel" [isEditing]="true"></app-game>
   </div>

@@ -1,1 +1,18 @@
-<p>level-toolbar works!</p>
+<div>
+  <button mat-button id="paintTool" (click)="openPaintTool()">
+    Select Tile <img [src]="selectedTileSrc" />
+  </button>
+</div>
+<mat-card
+  class="mat-elevation-z4"
+  id="tilesPanel"
+  *ngIf="isTilesPanelOpen"
+  (click)="handleTilesPanelClick($event)"
+>
+  <img
+    class="tile"
+    [id]="'tileIndex-' + (i + 1)"
+    [src]="src"
+    *ngFor="let src of tileSources; index as i"
+  />
+</mat-card>

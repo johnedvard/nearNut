@@ -4,6 +4,7 @@ import { GameModule } from '../game/game.module';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [],
@@ -13,7 +14,14 @@ import { MatButtonModule } from '@angular/material/button';
     MatTabsModule,
     MatCardModule,
     MatButtonModule,
+    MatSelectModule,
   ],
-  exports: [GameModule, MatTabsModule, MatCardModule, MatButtonModule],
+  exports: [
+    GameModule,
+    MatTabsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatSelectModule,
+  ],
 })
 export class SharedModule {}
