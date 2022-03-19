@@ -2,7 +2,7 @@ import { getPointer, offPointer, on, onPointer, TileEngine } from 'kontra';
 import { EditorEvent } from './editorEvent';
 import { EditorTile } from './editorTile';
 import { getCol, getRow } from './gameUtils';
-import { edgeLabels, MainBlockType } from './mainBlockType';
+
 type PointerState = 'panning' | 'idle' | 'drawing' | 'erasing';
 type Tool = 'block';
 type Brush = 'main';

@@ -59,8 +59,8 @@ export const loadLevelFromFile = (
 };
 
 export const getRow = (y, tileheight, scale, sy) => {
-  return ((y + sy) / (tileheight * scale)) | 0;
+  return ((y + sy * scale) / (tileheight * scale)) | 0;
 };
 export const getCol = (x, tilewidth, scale, sx) => {
-  return ((x + sx) / (tilewidth * scale)) | 0;
+  return ((x + sx * scale) / (tilewidth * scale)) | 0;
 };
