@@ -44,7 +44,6 @@ export class LevelEditorComponent implements OnInit, OnDestroy {
     this.setState('selecting');
   }
   setState(state: State): void {
-    console.log('set state', state);
     this.state = state;
   }
 
@@ -55,6 +54,13 @@ export class LevelEditorComponent implements OnInit, OnDestroy {
     // Check if name (id) is taken
     // Create new empty NFT (remember to add 1 YoctoNear)
     this.createNewLevelLocalStogare();
+  }
+  clickTestEditLevel() {
+    if (this.state !== 'playing') {
+      this.setState('playing');
+    } else {
+      this.setState('editing');
+    }
   }
 
   /**

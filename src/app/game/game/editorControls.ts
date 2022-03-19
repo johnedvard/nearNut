@@ -7,7 +7,7 @@ type PointerState = 'panning' | 'idle' | 'drawing' | 'erasing';
 type Tool = 'block';
 type Brush = 'main';
 export class EditorControls {
-  DELETE_TILE = 14;
+  DELETE_TILE = 0;
   PRIMARY_BUTTON = 0;
   AUXILIARY_BUTTON = 1;
   SECONDARY_BUTTON = 2;
@@ -42,13 +42,12 @@ export class EditorControls {
   }
 
   onSelectTile = ({ tile }) => {
-    console.log(tile);
     this.setSelectedTile(tile);
   };
   setSelectedTile(tile: number) {
     // tile 17 is a transparent tile, use it the same as the delete tile
-    if (tile === 17) tile = 14;
-    console.log('set tile', tile);
+    if (tile === 17) tile = this.DELETE_TILE;
+    if (tile === 14) tile = this.DELETE_TILE;
     this.selectedTile = tile;
   }
 
@@ -91,18 +90,22 @@ export class EditorControls {
       this.scale,
       this.tileEngine.sx
     );
-    if (this.currCol !== col || this.currRow != row) {
-      this.currCol = col;
-      this.currRow = row;
+    this.currCol = col;
+    this.currRow = row;
 
-      // TODO (johnedvard) Expand tilemap if out of bounds
-      const adjacentTiles = this.getAdjecentTiles({ col, row, layerName });
+    // TODO (johnedvard) Expand tilemap if out of bounds
+    const adjacentTiles = this.getAdjecentTiles({ col, row, layerName });
+    if (this.selectedTile === this.DELETE_TILE) {
+      this.tileEngine.setTileAtLayer(layerName, { col, row }, 14); // the "empty" tile
+    }
+    // Need to set timout to draw two times in case of delete tile
+    setTimeout(() => {
       this.tileEngine.setTileAtLayer(
         layerName,
         { col, row },
         this.selectedTile
       );
-    }
+    });
   }
   getAdjecentTiles({ col, row, layerName }): EditorTile[] {
     const nwCoord = { row: row - 1, col: col - 1 };

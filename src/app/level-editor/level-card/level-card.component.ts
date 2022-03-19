@@ -16,15 +16,12 @@ export class LevelCardComponent implements OnInit {
   ngOnInit(): void {}
 
   clickEditLevel() {
-    console.log('edit this level');
     this.editLevel.emit(this.level);
   }
   clickPlayLevel() {
-    console.log('edit play this level');
     this.playLevel.emit(this.level);
   }
   clickDeleteLevel() {
-    console.log('delete level');
     this.levelEditor.deleteLevel(this.level);
   }
 }

@@ -1,6 +1,7 @@
 import { GameLoop, init, initKeys, initPointer, TileEngine } from 'kontra';
 import { EditorControls } from './editorControls';
 import { createGameObject } from './gameObjectFactory';
+import { gameHeight, gameWidth } from './gameSettings';
 import { loadLevelFromObject } from './gameUtils';
 import { IGameObject } from './iGameObject';
 import { ILevelData } from './iLevelData';
@@ -61,13 +62,13 @@ export class LevelEditor {
 
   initEditorLoop({ tileEngine, gameObjects }) {
     this.tileEngine = tileEngine;
-    const mapheight = 600;
-    const mapwidth = 800;
+    const mapheight = gameHeight;
+    const mapwidth = gameWidth;
     // hack to fake tilengine width and height, making it possible to move the camera
     tileEngine.mapwidth = mapwidth;
     tileEngine.mapheight = mapheight;
-    this.canvas.height = 600;
-    this.canvas.width = 800;
+    this.canvas.height = mapheight;
+    this.canvas.width = mapwidth;
     this.ctx.scale(this.scale, this.scale);
     this.editorControls = new EditorControls(this.canvas, this.tileEngine, {
       scale: this.scale,

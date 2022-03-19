@@ -25,6 +25,7 @@ import { GameObjects } from './gameObjects';
 import { Player } from './player';
 import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
+import { gameHeight, gameWidth } from './gameSettings';
 
 export class Game {
   private state: GameState = GameState.loading;
@@ -84,8 +85,8 @@ export class Game {
     this.setState(GameState.ready);
     this.initGame(gameObjects);
     this.initKeyBindings();
-    this.canvas.height = tileEngine.mapheight * this.scale;
-    this.canvas.width = tileEngine.mapwidth * this.scale;
+    this.canvas.height = gameHeight;
+    this.canvas.width = gameWidth;
     this.ctx.scale(this.scale, this.scale);
 
     this.tileEngine = tileEngine;
@@ -105,15 +106,15 @@ export class Game {
         if (this.ctx.imageSmoothingEnabled) {
           this.ctx.imageSmoothingEnabled = false;
         }
+        if (tileEngine) {
+          this.tileEngine.render();
+        }
         this.player.render();
         this.goal.render();
         this.goalSwitch.render();
         this.gos.forEach((go: any) => {
           go.render();
         });
-        if (tileEngine) {
-          this.tileEngine.render();
-        }
       },
     });
     this.loop.start();

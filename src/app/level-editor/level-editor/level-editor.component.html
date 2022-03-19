@@ -27,13 +27,14 @@
 </div>
 
 <div *ngIf="selectedLevel">
-  <div *ngIf="state === 'playing'">
-    <button mat-button (click)="goBackToSelection()">Back</button>
-    <app-game [level]="selectedLevel"></app-game>
-  </div>
-  <div *ngIf="state === 'editing'">
-    <app-level-toolbar> </app-level-toolbar>
-    <button mat-button (click)="goBackToSelection()">Back</button>
-    <app-game [level]="selectedLevel" [isEditing]="true"></app-game>
-  </div>
+  <app-level-toolbar> </app-level-toolbar>
+  <button mat-button (click)="goBackToSelection()">Back</button>
+  <app-game
+    [level]="selectedLevel"
+    [isEditing]="state === 'editing'"
+  ></app-game>
+  <button mat-button (click)="clickTestEditLevel()">
+    <span *ngIf="state === 'editing'">Test Level</span>
+    <span *ngIf="state === 'playing'">Edit Level</span>
+  </button>
 </div>
