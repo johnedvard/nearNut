@@ -2,6 +2,7 @@ import { GameObject, load, Sprite, TileEngine } from 'kontra';
 import { Game } from './game';
 import { ILevelData } from './iLevelData';
 import { GameObjects } from './gameObjects';
+import { tileMapNameDefault } from './gameSettings';
 
 export const getPlayerControls = (): string[] => {
   // TODO (johnedvard) use user settings to configure keys
@@ -33,7 +34,7 @@ export const isOutOfBounds = (game: Game, go: Sprite): boolean => {
 export const loadLevelFromObject = (
   level: ILevelData
 ): Promise<{ tileEngine: TileEngine; gameObjects: GameObjects }> => {
-  return load('assets/tilesets/tileset_32x32_default.png').then((assets) => {
+  return load(tileMapNameDefault).then((assets) => {
     // can also use dataAssets (stores all kontra assets)
     level.tilesets = [{ image: assets[0], firstgid: 1 }];
     const tileEngine = TileEngine({ ...level });
@@ -44,18 +45,17 @@ export const loadLevelFromObject = (
 export const loadLevelFromFile = (
   levelName: string
 ): Promise<{ tileEngine: TileEngine; gameObjects: GameObjects }> => {
-  return load(
-    'assets/tilesets/tileset_32x32_default.png',
-    'assets/levels/001.json'
-  ).then((assets) => {
-    console.warn(
-      'Passing levelName not implemented yet. Always open same level'
-    );
-    // can also use dataAssets (stores all kontra assets)
-    assets[1].tilesets = [{ image: assets[0], firstgid: 1 }];
-    const tileEngine = TileEngine({ ...assets[1] });
-    return { tileEngine, gameObjects: assets[1].gameObjects };
-  });
+  return load(tileMapNameDefault, `assets/levels/${levelName}.json`).then(
+    (assets) => {
+      console.warn(
+        'Passing levelName not implemented yet. Always open same level'
+      );
+      // can also use dataAssets (stores all kontra assets)
+      assets[1].tilesets = [{ image: assets[0], firstgid: 1 }];
+      const tileEngine = TileEngine({ ...assets[1] });
+      return { tileEngine, gameObjects: assets[1].gameObjects };
+    }
+  );
 };
 
 export const getRow = (y, tileheight, scale, sy) => {
@@ -63,4 +63,11 @@ export const getRow = (y, tileheight, scale, sy) => {
 };
 export const getCol = (x, tilewidth, scale, sx) => {
   return ((x + sx * scale) / (tilewidth * scale)) | 0;
+};
+
+export const getMaxSxSy = ({ mapwidth, mapheight, canvas, scale }) => {
+  return {
+    maxSx: Math.max(0, (mapwidth - canvas.width) / scale),
+    maxSy: Math.max(0, (mapheight - canvas.height) / scale),
+  };
 };

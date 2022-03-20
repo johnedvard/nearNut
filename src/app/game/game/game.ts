@@ -3,16 +3,19 @@ import {
   GameLoop,
   initKeys,
   initPointer,
-  load,
   TileEngine,
   emit,
   onKey,
   on,
   off,
+  GameObject,
 } from 'kontra';
 import { GameEvent } from './gameEvent';
 import { GameState } from './gameState';
 import {
+  getCol,
+  getMaxSxSy,
+  getRow,
   loadLevelFromFile,
   loadLevelFromObject,
   rectCollision,
@@ -29,7 +32,7 @@ import { gameHeight, gameWidth } from './gameSettings';
 
 export class Game {
   private state: GameState = GameState.loading;
-  scale = 2 * window.devicePixelRatio;
+  scale = 2;
   canvas: HTMLCanvasElement;
   gameObjects: GameObjects;
   gos: IGameObject[] = [];
@@ -39,6 +42,8 @@ export class Game {
   player: Player;
   goal: Goal;
   goalSwitch: GoalSwitch;
+  maxSx = 0;
+  maxSy = 0;
   constructor();
   constructor(level: ILevelData);
   /**
@@ -81,19 +86,42 @@ export class Game {
   }
 
   initGameLoop({ tileEngine, gameObjects }) {
+    const scale = this.scale;
     this.gameObjects = gameObjects;
     this.setState(GameState.ready);
     this.initGame(gameObjects);
     this.initKeyBindings();
-    this.canvas.height = gameHeight;
-    this.canvas.width = gameWidth;
-    this.ctx.scale(this.scale, this.scale);
-
     this.tileEngine = tileEngine;
+    const mapheight = gameHeight;
+    const mapwidth = gameWidth;
+    this.canvas.height = mapheight;
+    this.canvas.width = mapwidth;
+    // hack to fake tilengine width and height, making it possible to move the camera
+    tileEngine.mapwidth = tileEngine.width * tileEngine.tilewidth * scale;
+    tileEngine.mapheight = tileEngine.height * tileEngine.tileheight * scale;
+    const { maxSx, maxSy } = getMaxSxSy({
+      mapwidth: tileEngine.mapwidth,
+      mapheight: tileEngine.mapheight,
+      canvas: this.canvas,
+      scale: this.scale,
+    });
+    this.maxSx = maxSx;
+    this.maxSy = maxSy;
+    this.ctx.scale(this.scale, this.scale);
+    this.tileEngine.add(this.goal);
+    this.tileEngine.add(this.goalSwitch);
+
     this.loop = GameLoop({
       update: (dt: number) => {
         this.player.update(dt);
         this.goal.update(dt);
+        if (this.player.sprite.x - this.tileEngine.sx > 100) {
+          // let sx = this.tileEngine.sx + 1;
+          // if (sx >= this.maxSx) {
+          //   sx = this.maxSx - 1;
+          // }
+          // this.tileEngine.sx = sx;
+        }
         this.goalSwitch.update(dt);
         this.gos.forEach((go: any) => {
           go.update(dt);
@@ -106,12 +134,12 @@ export class Game {
         if (this.ctx.imageSmoothingEnabled) {
           this.ctx.imageSmoothingEnabled = false;
         }
-        if (tileEngine) {
+        if (this.tileEngine) {
           this.tileEngine.render();
         }
         this.player.render();
-        this.goal.render();
-        this.goalSwitch.render();
+        // this.goal.render();
+        // this.goalSwitch.render();
         this.gos.forEach((go: any) => {
           go.render();
         });
@@ -144,11 +172,39 @@ export class Game {
     }
   };
 
+  layerCollidesWith(name, object, tileEngine) {
+    let { tilewidth, tileheight, layers } = tileEngine;
+    let { x, y } = object.position; // use x,y coord in canvas
+    let { width, height } = object;
+
+    // TODO (johnedvard) take acnhor into account, now we assume anchor is 0.5 for x y
+    let row = getRow(y - height / 2, tileheight, 1, tileEngine.sy);
+    let col = getCol(x - width / 2, tilewidth, 1, tileEngine.sx);
+    let endRow = getRow(y + width / 2, tileheight, 1, tileEngine.sy);
+    let endCol = getCol(x + height / 2, tilewidth, 1, tileEngine.sx);
+
+    let layer: { data: number[] } = <{ data: number[] }>(
+      layers.find((l) => l['name'] === name)
+    );
+
+    console.log(row, col, endRow, endCol);
+    // check all tiles
+    for (let r = row; r <= endRow; r++) {
+      for (let c = col; c <= endCol; c++) {
+        if (layer.data[c + r * tileEngine.width]) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
   checkTileMapCollision(go: IGameObject) {
     if (this.tileEngine && go.sprite) {
-      const isCollision = this.tileEngine.layerCollidesWith(
+      const isCollision = this.layerCollidesWith(
         'ground',
-        go.sprite
+        go.sprite,
+        this.tileEngine
       );
       if (isCollision) {
         const tile = this.tileEngine.tileAtLayer('ground', { ...go.sprite });
@@ -168,14 +224,20 @@ export class Game {
 
   checkGoalSwitchColllision(go: IGameObject) {
     if (this.goalSwitch && go.sprite) {
-      if (rectCollision(this.goalSwitch.sprite, go.sprite)) {
+      const cpy: GameObject = { ...this.goalSwitch.sprite };
+      cpy.x = this.goalSwitch.sprite.x - this.tileEngine.sx;
+      cpy.y = this.goalSwitch.sprite.y - this.tileEngine.sy;
+      cpy.width = this.goalSwitch.sprite.width;
+      cpy.height = this.goalSwitch.sprite.height;
+
+      if (rectCollision(cpy, go.sprite)) {
         emit(GameEvent.goalSwitchCollision, { other: go });
       }
     }
   }
 
   checkGoalCollision(go: IGameObject) {
-    if (this.goalSwitch && go.sprite) {
+    if (this.goal && go.sprite) {
       if (rectCollision(this.goal.sprite, go.sprite)) {
         emit(GameEvent.goalCollision, { other: go });
       }

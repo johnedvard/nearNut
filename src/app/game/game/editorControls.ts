@@ -1,7 +1,7 @@
 import { getPointer, offPointer, on, onPointer, TileEngine } from 'kontra';
 import { EditorEvent } from './editorEvent';
 import { EditorTile } from './editorTile';
-import { getCol, getRow } from './gameUtils';
+import { getCol, getMaxSxSy, getRow } from './gameUtils';
 
 type PointerState = 'panning' | 'idle' | 'drawing' | 'erasing';
 type Tool = 'block';
@@ -174,8 +174,14 @@ export class EditorControls {
   }
 
   setMaxSxSy({ mapwidth, mapheight }) {
-    this.maxSx = Math.max(0, (mapwidth - this.canvas.width) / this.scale);
-    this.maxSy = Math.max(0, (mapheight - this.canvas.height) / this.scale);
+    const { maxSx, maxSy } = getMaxSxSy({
+      mapwidth,
+      mapheight,
+      canvas: this.canvas,
+      scale: this.scale,
+    });
+    this.maxSx = maxSx;
+    this.maxSy = maxSy;
   }
 
   setPointerState(state: PointerState) {

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { load, emit } from 'kontra';
 import { EditorEvent } from 'src/app/game/game/editorEvent';
+import { tileMapNameDefault } from 'src/app/game/game/gameSettings';
 
 @Component({
   selector: 'app-level-toolbar',
@@ -24,7 +25,7 @@ export class LevelToolbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    load('assets/tilesets/tileset_32x32_default.png').then((assets) => {
+    load(tileMapNameDefault).then((assets) => {
       const canvas = document.createElement('canvas');
       canvas.width = 32;
       canvas.height = 32;

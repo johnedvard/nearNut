@@ -7,7 +7,6 @@ import { IGameObject } from './iGameObject';
 import { ILevelData } from './iLevelData';
 
 export class LevelEditor {
-  //scale = 2 * window.devicePixelRatio;
   scale = 2;
   gos: IGameObject[] = [];
   canvas: HTMLCanvasElement;
@@ -62,11 +61,12 @@ export class LevelEditor {
 
   initEditorLoop({ tileEngine, gameObjects }) {
     this.tileEngine = tileEngine;
+    const scale = this.scale;
     const mapheight = gameHeight;
     const mapwidth = gameWidth;
     // hack to fake tilengine width and height, making it possible to move the camera
-    tileEngine.mapwidth = mapwidth;
-    tileEngine.mapheight = mapheight;
+    tileEngine.mapwidth = tileEngine.width * tileEngine.tilewidth * scale;
+    tileEngine.mapheight = tileEngine.height * tileEngine.tileheight * scale;
     this.canvas.height = mapheight;
     this.canvas.width = mapwidth;
     this.ctx.scale(this.scale, this.scale);
