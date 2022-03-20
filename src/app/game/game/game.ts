@@ -10,6 +10,7 @@ import {
   off,
   GameObject,
   getWorldRect,
+  lerp,
 } from 'kontra';
 import { GameEvent } from './gameEvent';
 import { GameState } from './gameState';
@@ -90,7 +91,6 @@ export class Game {
     const scale = this.scale;
     this.gameObjects = gameObjects;
     this.setState(GameState.ready);
-    this.initGame(gameObjects);
     this.initKeyBindings();
     this.tileEngine = tileEngine;
     const mapheight = gameHeight;
@@ -113,21 +113,16 @@ export class Game {
     this.tileEngine.add(this.goalSwitch);
     this.tileEngine.add(this.player);
 
+    this.initGame(gameObjects);
     this.loop = GameLoop({
       update: (dt: number) => {
         this.player.update(dt);
         this.goal.update(dt);
-        if (this.player.sprite.x - this.tileEngine.sx > 100) {
-          let sx = this.tileEngine.sx + 1;
-          if (sx >= this.maxSx) {
-            sx = this.maxSx - 1;
-          }
-          this.tileEngine.sx = sx;
-        }
         this.goalSwitch.update(dt);
         this.gos.forEach((go: any) => {
           go.update(dt);
         });
+        this.checkCameraControls();
         this.checkTileMapCollision(this.player);
         this.checkGoalSwitchColllision(this.player);
         this.checkGoalCollision(this.player);
@@ -151,16 +146,13 @@ export class Game {
       this.tileEngine.remove(this.goal);
       this.tileEngine.remove(this.goalSwitch);
       this.tileEngine.remove(this.player);
-    }
-    this.initPlayer(gameObjects.player);
-    this.initGoal(gameObjects.goal);
-    this.initGoalSwitch(gameObjects.goalSwitch);
-    if (this.tileEngine) {
+      this.initPlayer(gameObjects.player);
+      this.initGoal(gameObjects.goal);
+      this.initGoalSwitch(gameObjects.goalSwitch);
       this.tileEngine.add(this.goal);
       this.tileEngine.add(this.goalSwitch);
       this.tileEngine.add(this.player);
     }
-    console.log(this.tileEngine);
   }
 
   onLevelComplete = () => {
@@ -255,6 +247,28 @@ export class Game {
       this.state = state;
       emit(GameEvent.gameStateChange, { state });
     }
+  }
+
+  checkCameraControls() {
+    const pan = (key, max, cameraDiff) => {
+      let camPos = this.tileEngine[key];
+      if (cameraDiff > 140) {
+        camPos += 5;
+      } else if (cameraDiff < 60) {
+        camPos -= 5;
+      }
+      if (camPos >= max) {
+        camPos = max;
+      } else if (camPos <= 0) {
+        camPos = 0;
+      }
+      this.tileEngine[key] = lerp(this.tileEngine[key], camPos, 0.3);
+    };
+    const caneraDiffX = this.player.sprite.x - this.tileEngine.sx;
+    const caneraDiffY = this.player.sprite.y - this.tileEngine.sy;
+
+    pan('sx', this.maxSx, caneraDiffX);
+    pan('sy', this.maxSy, caneraDiffY);
   }
 
   initKeyBindings() {
