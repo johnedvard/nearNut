@@ -151,9 +151,19 @@ export class Game {
         go.sprite
       );
       if (isCollision) {
-        emit(GameEvent.hitWall, { go });
+        const tile = this.tileEngine.tileAtLayer('ground', { ...go.sprite });
+        const isTileCollision = this.checkTileCollision(go, tile);
+        if (isTileCollision) {
+          emit(GameEvent.hitWall, { go });
+        }
       }
     }
+  }
+  checkTileCollision(go: IGameObject, tile: number): boolean {
+    if (tile && (tile === 14 || tile === 17 || tile === 0)) {
+      return false;
+    }
+    return true;
   }
 
   checkGoalSwitchColllision(go: IGameObject) {
