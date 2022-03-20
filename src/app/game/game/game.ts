@@ -9,6 +9,7 @@ import {
   on,
   off,
   GameObject,
+  getWorldRect,
 } from 'kontra';
 import { GameEvent } from './gameEvent';
 import { GameState } from './gameState';
@@ -110,17 +111,18 @@ export class Game {
     this.ctx.scale(this.scale, this.scale);
     this.tileEngine.add(this.goal);
     this.tileEngine.add(this.goalSwitch);
+    this.tileEngine.add(this.player);
 
     this.loop = GameLoop({
       update: (dt: number) => {
         this.player.update(dt);
         this.goal.update(dt);
         if (this.player.sprite.x - this.tileEngine.sx > 100) {
-          // let sx = this.tileEngine.sx + 1;
-          // if (sx >= this.maxSx) {
-          //   sx = this.maxSx - 1;
-          // }
-          // this.tileEngine.sx = sx;
+          let sx = this.tileEngine.sx + 1;
+          if (sx >= this.maxSx) {
+            sx = this.maxSx - 1;
+          }
+          this.tileEngine.sx = sx;
         }
         this.goalSwitch.update(dt);
         this.gos.forEach((go: any) => {
@@ -137,9 +139,6 @@ export class Game {
         if (this.tileEngine) {
           this.tileEngine.render();
         }
-        this.player.render();
-        // this.goal.render();
-        // this.goalSwitch.render();
         this.gos.forEach((go: any) => {
           go.render();
         });
@@ -148,9 +147,20 @@ export class Game {
     this.loop.start();
   }
   initGame(gameObjects: GameObjects) {
+    if (this.tileEngine) {
+      this.tileEngine.remove(this.goal);
+      this.tileEngine.remove(this.goalSwitch);
+      this.tileEngine.remove(this.player);
+    }
     this.initPlayer(gameObjects.player);
     this.initGoal(gameObjects.goal);
     this.initGoalSwitch(gameObjects.goalSwitch);
+    if (this.tileEngine) {
+      this.tileEngine.add(this.goal);
+      this.tileEngine.add(this.goalSwitch);
+      this.tileEngine.add(this.player);
+    }
+    console.log(this.tileEngine);
   }
 
   onLevelComplete = () => {
@@ -172,39 +182,11 @@ export class Game {
     }
   };
 
-  layerCollidesWith(name, object, tileEngine) {
-    let { tilewidth, tileheight, layers } = tileEngine;
-    let { x, y } = object.position; // use x,y coord in canvas
-    let { width, height } = object;
-
-    // TODO (johnedvard) take acnhor into account, now we assume anchor is 0.5 for x y
-    let row = getRow(y - height / 2, tileheight, 1, tileEngine.sy);
-    let col = getCol(x - width / 2, tilewidth, 1, tileEngine.sx);
-    let endRow = getRow(y + width / 2, tileheight, 1, tileEngine.sy);
-    let endCol = getCol(x + height / 2, tilewidth, 1, tileEngine.sx);
-
-    let layer: { data: number[] } = <{ data: number[] }>(
-      layers.find((l) => l['name'] === name)
-    );
-
-    console.log(row, col, endRow, endCol);
-    // check all tiles
-    for (let r = row; r <= endRow; r++) {
-      for (let c = col; c <= endCol; c++) {
-        if (layer.data[c + r * tileEngine.width]) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
   checkTileMapCollision(go: IGameObject) {
     if (this.tileEngine && go.sprite) {
-      const isCollision = this.layerCollidesWith(
+      const isCollision = this.tileEngine.layerCollidesWith(
         'ground',
-        go.sprite,
-        this.tileEngine
+        go.sprite
       );
       if (isCollision) {
         const tile = this.tileEngine.tileAtLayer('ground', { ...go.sprite });
@@ -224,13 +206,7 @@ export class Game {
 
   checkGoalSwitchColllision(go: IGameObject) {
     if (this.goalSwitch && go.sprite) {
-      const cpy: GameObject = { ...this.goalSwitch.sprite };
-      cpy.x = this.goalSwitch.sprite.x - this.tileEngine.sx;
-      cpy.y = this.goalSwitch.sprite.y - this.tileEngine.sy;
-      cpy.width = this.goalSwitch.sprite.width;
-      cpy.height = this.goalSwitch.sprite.height;
-
-      if (rectCollision(cpy, go.sprite)) {
+      if (rectCollision(this.goalSwitch.sprite, go.sprite)) {
         emit(GameEvent.goalSwitchCollision, { other: go });
       }
     }
