@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subscription } from 'rxjs';
 import { ILevelData } from 'src/app/game/game/iLevelData';
 import { LevelEditorService } from '../level-editor.service';
@@ -17,7 +18,10 @@ export class LevelEditorComponent implements OnInit, OnDestroy {
   testWidth = new Array<number>(100).fill(0);
   testHeight = new Array<number>(100).fill(0);
 
-  constructor(private leveEditor: LevelEditorService) {}
+  constructor(
+    private leveEditor: LevelEditorService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.levelsSub = this.leveEditor.getLevels().subscribe((levels) => {
@@ -61,6 +65,12 @@ export class LevelEditorComponent implements OnInit, OnDestroy {
     } else {
       this.setState('editing');
     }
+  }
+  clickSaveLevel() {
+    this.snackBar.open('Level saved', null, {
+      duration: 3000,
+    });
+    this.leveEditor.saveLevel(this.selectedLevel);
   }
 
   /**

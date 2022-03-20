@@ -83,6 +83,9 @@ export class LevelEditorService {
     console.log('delete level', key);
     localStorage.removeItem(this.KEY_PREFIX + key);
   }
+  saveLevel(level: ILevelData) {
+    this.setLocalItem(level.name, level);
+  }
   initEmptyLevel(levelIndex: number): ILevelData {
     const level: ILevelData = {
       name: '' + levelIndex,
