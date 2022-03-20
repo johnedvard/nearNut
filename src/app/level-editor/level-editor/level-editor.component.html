@@ -1,7 +1,7 @@
 <div *ngIf="!selectedLevel">
-  <mat-tab-group animationDuration="0ms">
+  <button id="backButton" mat-button routerLink="/">Back</button>
+  <mat-tab-group animationDuration="0ms" mat-align-tabs="center">
     <mat-tab label="My levels">
-      <button mat-button routerLink="/">Back</button>
       <div id="myLevels">
         TODO use near-api-js to search for levels
         <app-level-card
@@ -20,15 +20,13 @@
       </div>
     </mat-tab>
     <mat-tab label="Find Level">
-      <button mat-button routerLink="/">Back</button>
       <div>TODO add input to search for token_id, and give the level a try</div>
     </mat-tab>
   </mat-tab-group>
 </div>
 
 <div *ngIf="selectedLevel">
-  <app-level-toolbar> </app-level-toolbar>
-  <button mat-button (click)="goBackToSelection()">Back</button>
+  <app-level-toolbar (backClick)="goBackToSelection()"> </app-level-toolbar>
   <app-game
     [level]="selectedLevel"
     [isEditing]="state === 'editing'"

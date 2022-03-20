@@ -1,6 +1,5 @@
-import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { init, GameLoop, Sprite, load, emit } from 'kontra';
-import { Subject } from 'rxjs';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { load, emit } from 'kontra';
 import { EditorEvent } from 'src/app/game/game/editorEvent';
 
 @Component({
@@ -12,12 +11,17 @@ export class LevelToolbarComponent implements OnInit {
   isTilesPanelOpen = false;
   tileSources = [];
   selectedTileSrc;
+  @Output() backClick = new EventEmitter();
   tiles: any[] = [
     { value: 'steak-0', viewValue: 'Steak' },
     { value: 'pizza-1', viewValue: 'Pizza' },
     { value: 'tacos-2', viewValue: 'Tacos' },
   ];
   constructor() {}
+
+  backButtonClick(evt) {
+    this.backClick.emit(evt);
+  }
 
   ngOnInit(): void {
     load('assets/tilesets/tileset_32x32_default.png').then((assets) => {
