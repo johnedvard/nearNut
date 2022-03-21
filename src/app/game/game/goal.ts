@@ -1,4 +1,4 @@
-import { emit, load, off, on, Sprite, SpriteSheet } from 'kontra';
+import { emit, load, off, on, Sprite, SpriteSheet, untrack } from 'kontra';
 import { GameEvent } from './gameEvent';
 import { GoalState } from './goalState';
 import { IGameObject } from './iGameObject';

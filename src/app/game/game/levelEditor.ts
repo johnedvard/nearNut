@@ -1,4 +1,11 @@
-import { GameLoop, init, initKeys, initPointer, TileEngine } from 'kontra';
+import {
+  GameLoop,
+  init,
+  initKeys,
+  initPointer,
+  TileEngine,
+  track,
+} from 'kontra';
 import { EditorControls } from './editorControls';
 import { createGameObject } from './gameObjectFactory';
 import { gameHeight, gameWidth } from './gameSettings';
@@ -78,6 +85,7 @@ export class LevelEditor {
       if (gameObjects.hasOwnProperty(key)) {
         const gameObj = createGameObject(key, { ...gameObjects[key] });
         this.gos.push(gameObj);
+        this.editorControls.addGameObject(gameObj);
         tileEngine.add(gameObj);
       }
     }

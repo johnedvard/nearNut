@@ -1,7 +1,16 @@
-import { getPointer, offPointer, on, onPointer, TileEngine } from 'kontra';
+import {
+  getPointer,
+  offPointer,
+  on,
+  onPointer,
+  TileEngine,
+  track,
+  untrack,
+} from 'kontra';
 import { EditorEvent } from './editorEvent';
 import { EditorTile } from './editorTile';
 import { getCol, getMaxSxSy, getRow } from './gameUtils';
+import { IGameObject } from './iGameObject';
 
 type PointerState = 'panning' | 'idle' | 'drawing' | 'erasing';
 type Tool = 'block';
@@ -25,6 +34,7 @@ export class EditorControls {
   maxSy = 0; // number of mapheight pixels not inside the canvas
   currCol = 0;
   currRow = 0;
+  gos: IGameObject[] = [];
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -68,14 +78,14 @@ export class EditorControls {
   draw() {
     switch (this.selectedBrush) {
       case 'main':
-        this.drawTile();
+        this.drawTile(this.selectedTile);
         break;
     }
   }
   /**
    * Also draws adjecent tiles
    */
-  drawTile() {
+  drawTile(tileToDraw) {
     const layerName = 'ground';
     const p = getPointer();
     const row = getRow(
@@ -95,16 +105,12 @@ export class EditorControls {
 
     // TODO (johnedvard) Expand tilemap if out of bounds
     const adjacentTiles = this.getAdjecentTiles({ col, row, layerName });
-    if (this.selectedTile === this.DELETE_TILE) {
+    if (tileToDraw === this.DELETE_TILE) {
       this.tileEngine.setTileAtLayer(layerName, { col, row }, 14); // the "empty" tile
     }
     // Need to set timout to draw two times in case of delete tile
     setTimeout(() => {
-      this.tileEngine.setTileAtLayer(
-        layerName,
-        { col, row },
-        this.selectedTile
-      );
+      this.tileEngine.setTileAtLayer(layerName, { col, row }, tileToDraw);
     });
   }
   getAdjecentTiles({ col, row, layerName }): EditorTile[] {
@@ -128,14 +134,17 @@ export class EditorControls {
     ];
   }
 
-  erase() {}
+  erase() {
+    this.drawTile(this.DELETE_TILE);
+  }
 
-  onPointerUp = (e, obejct) => {
+  onPointerUp = (e) => {
     this.setPointerState('idle');
   };
 
-  onPointerDown = (e, object) => {
-    console.log(e);
+  onPointerDown = (e) => {
+    this.checkPointerDownObjects(e);
+
     if (e.altKey && e.button === this.PRIMARY_BUTTON) {
       this.setPointerState('panning');
       this.currTileEngineSx = this.tileEngine.sx;
@@ -173,6 +182,24 @@ export class EditorControls {
     });
   }
 
+  /** takes sx and scale into account when checking for object */
+  checkPointerDownObjects(e) {
+    this.gos.forEach((go) => {
+      if (
+        e.offsetX + this.tileEngine.sx <
+          go.sprite.x * this.scale + go.sprite.width &&
+        e.offsetX + this.tileEngine.sx >
+          go.sprite.x * this.scale - go.sprite.width &&
+        e.offsetY + this.tileEngine.sy <
+          go.sprite.y * this.scale + go.sprite.height &&
+        e.offsetY + this.tileEngine.sy >
+          go.sprite.y * this.scale - go.sprite.height
+      ) {
+        console.log('found object', go);
+      }
+    });
+  }
+
   setMaxSxSy({ mapwidth, mapheight }) {
     const { maxSx, maxSy } = getMaxSxSy({
       mapwidth,
@@ -201,7 +228,12 @@ export class EditorControls {
     }
   }
 
+  addGameObject(gameObj: IGameObject) {
+    this.gos.push(gameObj);
+  }
+
   cleanup() {
+    this.gos.length = 0;
     offPointer('down');
     offPointer('up');
   }
