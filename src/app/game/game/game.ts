@@ -8,8 +8,6 @@ import {
   onKey,
   on,
   off,
-  GameObject,
-  getWorldRect,
   lerp,
 } from 'kontra';
 import { GameEvent } from './gameEvent';
@@ -22,8 +20,8 @@ import {
   loadLevelFromObject,
   rectCollision,
 } from './gameUtils';
-import { Goal } from './goal';
-import { GoalSwitch } from './goalSwitch';
+import { Door } from './door';
+import { DoorSwitch } from './doorSwitch';
 import { IGameObject } from './iGameObject';
 import { ILevelData } from './iLevelData';
 import { GameObjects } from './gameObjects';
@@ -42,8 +40,8 @@ export class Game {
   tileEngine: TileEngine;
   ctx: CanvasRenderingContext2D;
   player: Player;
-  goal: Goal;
-  goalSwitch: GoalSwitch;
+  door: Door;
+  doorSwitch: DoorSwitch;
   maxSx = 0;
   maxSy = 0;
   constructor();
@@ -82,8 +80,8 @@ export class Game {
     off(GameEvent.playerStateChange, this.onPlayerStateChange);
     off(GameEvent.levelComplete, this.onLevelComplete);
     this.player.cleanup();
-    this.goal.cleanup();
-    this.goalSwitch.cleanup();
+    this.door.cleanup();
+    this.doorSwitch.cleanup();
     this.gos.forEach((go) => go.cleanup());
   }
 
@@ -112,23 +110,23 @@ export class Game {
     this.maxSx = maxSx;
     this.maxSy = maxSy;
     this.ctx.scale(this.scale, this.scale);
-    this.tileEngine.add(this.goal);
-    this.tileEngine.add(this.goalSwitch);
+    this.tileEngine.add(this.door);
+    this.tileEngine.add(this.doorSwitch);
     this.tileEngine.add(this.player);
 
     this.initGame(gameObjects);
     this.loop = GameLoop({
       update: (dt: number) => {
         this.player.update(dt);
-        this.goal.update(dt);
-        this.goalSwitch.update(dt);
+        this.door.update(dt);
+        this.doorSwitch.update(dt);
         this.gos.forEach((go: any) => {
           go.update(dt);
         });
         this.checkCameraControls();
         this.checkTileMapCollision(this.player);
-        this.checkGoalSwitchColllision(this.player);
-        this.checkGoalCollision(this.player);
+        this.checkDoorSwitchColllision(this.player);
+        this.checkDoorCollision(this.player);
       },
       render: () => {
         if (this.ctx.imageSmoothingEnabled) {
@@ -146,14 +144,14 @@ export class Game {
   }
   initGame(gameObjects: GameObjects) {
     if (this.tileEngine) {
-      this.tileEngine.remove(this.goal);
-      this.tileEngine.remove(this.goalSwitch);
+      this.tileEngine.remove(this.door);
+      this.tileEngine.remove(this.doorSwitch);
       this.tileEngine.remove(this.player);
       this.initPlayer(gameObjects.player);
-      this.initGoal(gameObjects.goal);
-      this.initGoalSwitch(gameObjects.goalSwitch);
-      this.tileEngine.add(this.goal);
-      this.tileEngine.add(this.goalSwitch);
+      this.initDoor(gameObjects.door);
+      this.initDoorSwitch(gameObjects.doorSwitch);
+      this.tileEngine.add(this.door);
+      this.tileEngine.add(this.doorSwitch);
       this.tileEngine.add(this.player);
     }
   }
@@ -199,18 +197,18 @@ export class Game {
     return true;
   }
 
-  checkGoalSwitchColllision(go: IGameObject) {
-    if (this.goalSwitch && go.sprite) {
-      if (rectCollision(this.goalSwitch.sprite, go.sprite)) {
-        emit(GameEvent.goalSwitchCollision, { other: go });
+  checkDoorSwitchColllision(go: IGameObject) {
+    if (this.doorSwitch && go.sprite) {
+      if (rectCollision(this.doorSwitch.sprite, go.sprite)) {
+        emit(GameEvent.doorSwitchCollision, { other: go });
       }
     }
   }
 
-  checkGoalCollision(go: IGameObject) {
-    if (this.goal && go.sprite) {
-      if (rectCollision(this.goal.sprite, go.sprite)) {
-        emit(GameEvent.goalCollision, { other: go });
+  checkDoorCollision(go: IGameObject) {
+    if (this.door && go.sprite) {
+      if (rectCollision(this.door.sprite, go.sprite)) {
+        emit(GameEvent.doorCollision, { other: go });
       }
     }
   }
@@ -228,11 +226,11 @@ export class Game {
     });
   }
 
-  initGoal({ x, y }) {
-    this.goal = new Goal({ x, y });
+  initDoor({ x, y }) {
+    this.door = new Door({ x, y });
   }
-  initGoalSwitch({ x, y }) {
-    this.goalSwitch = new GoalSwitch({ x, y });
+  initDoorSwitch({ x, y }) {
+    this.doorSwitch = new DoorSwitch({ x, y });
   }
   startGame() {
     switch (this.state) {

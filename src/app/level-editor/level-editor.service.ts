@@ -102,8 +102,8 @@ export class LevelEditorService {
       ],
       gameObjects: {
         player: { x: 40, y: 40 },
-        goal: { x: 218, y: 72 },
-        goalSwitch: { x: 120, y: 60 },
+        door: { x: 218, y: 72 },
+        doorSwitch: { x: 120, y: 60 },
       },
     };
 

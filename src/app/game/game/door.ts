@@ -1,49 +1,49 @@
 import { emit, load, off, on, Sprite, SpriteSheet, untrack } from 'kontra';
 import { GameEvent } from './gameEvent';
-import { GoalState } from './goalState';
+import { DoorState } from './doorState';
 import { IGameObject } from './iGameObject';
 import { Player } from './player';
 
-export class Goal implements IGameObject {
-  private state: GoalState = GoalState.closed;
+export class Door implements IGameObject {
+  private state: DoorState = DoorState.closed;
   ANIMATION_CLOSED = 'closed';
   ANIMATION_OPENING = 'opening';
   sprite: Sprite;
 
   constructor({ x, y }) {
-    this.initGoal({ x, y });
-    on(GameEvent.openGoal, this.onGoalOpen);
-    on(GameEvent.goalCollision, this.onGoalCollision);
+    this.initDoor({ x, y });
+    on(GameEvent.openDoor, this.onDoorOpen);
+    on(GameEvent.doorCollision, this.onDoorCollision);
   }
 
   cleanup(): void {
-    off(GameEvent.openGoal, this.onGoalOpen);
-    off(GameEvent.goalCollision, this.onGoalCollision);
+    off(GameEvent.openDoor, this.onDoorOpen);
+    off(GameEvent.doorCollision, this.onDoorCollision);
   }
 
-  onGoalOpen = () => {
-    this.setState(GoalState.opening);
+  onDoorOpen = () => {
+    this.setState(DoorState.opening);
   };
-  onGoalCollision = ({ other }) => {
+  onDoorCollision = ({ other }) => {
     if (other instanceof Player) {
       switch (this.state) {
-        case GoalState.opened:
-        case GoalState.opening:
+        case DoorState.opened:
+        case DoorState.opening:
           emit(GameEvent.levelComplete);
           break;
-        case GoalState.closed:
+        case DoorState.closed:
           break;
         default:
       }
     }
   };
 
-  setState(state: GoalState) {
+  setState(state: DoorState) {
     console.log('set state', state);
     if (this.state !== state) {
       this.state = state;
       switch (state) {
-        case GoalState.opening:
+        case DoorState.opening:
           this.sprite.currentAnimation =
             this.sprite.animations[this.ANIMATION_OPENING];
           break;
@@ -54,7 +54,7 @@ export class Goal implements IGameObject {
     }
   }
 
-  initGoal({ x, y }) {
+  initDoor({ x, y }) {
     load(
       'assets/platform_metroidvania/miscellaneous sprites/strange_door_closed_anim_strip_10.png',
       'assets/platform_metroidvania/miscellaneous sprites/strange_door_opening_anim_strip_14.png'

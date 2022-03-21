@@ -1,11 +1,11 @@
-export type GameObjectType = 'player' | 'goal' | 'goalSwitch';
+export type GameObjectType = 'player' | 'door' | 'doorSwitch';
 export function isOfTypeGameObject(
   keyInput: string
 ): keyInput is GameObjectType {
-  return ['player', 'goal', 'goalSwitch'].includes(keyInput);
+  return ['player', 'door', 'doorSwitch'].includes(keyInput);
 }
 export interface GameObjects {
-  goal: { x: number; y: number };
+  door: { x: number; y: number };
   player: { x: number; y: number };
-  goalSwitch: { x: number; y: number };
+  doorSwitch: { x: number; y: number };
 }

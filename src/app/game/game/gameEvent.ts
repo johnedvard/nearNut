@@ -6,8 +6,8 @@ export enum GameEvent {
   gameStateChange = 'gameChange',
   gameOver = 'gameOver',
   newGame = 'newGame',
-  openGoal = 'openGoal',
-  goalCollision = 'goalcollision',
-  goalSwitchCollision = 'gscollision',
-  levelComplete = 'levelcomplete',
+  openDoor = 'openDoor',
+  doorCollision = 'doorCollision',
+  doorSwitchCollision = 'doorSwitchcollision',
+  levelComplete = 'levelComplete',
 }

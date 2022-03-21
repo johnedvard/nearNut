@@ -1,48 +1,39 @@
-import {
-  emit,
-  load,
-  off,
-  on,
-  Sprite,
-  SpriteSheet,
-  track,
-  untrack,
-} from 'kontra';
+import { emit, load, off, on, Sprite, SpriteSheet } from 'kontra';
 import { GameEvent } from './gameEvent';
-import { GoalSwitchState } from './goalSwitchState';
+import { DoorSwitchState } from './doorSwitchState';
 import { IGameObject } from './iGameObject';
 import { Player } from './player';
 
-export class GoalSwitch implements IGameObject {
-  private state: GoalSwitchState = GoalSwitchState.idle;
+export class DoorSwitch implements IGameObject {
+  private state: DoorSwitchState = DoorSwitchState.idle;
   ANIMATION_IDLE = 'idle';
   ANIMATION_COLLECTED = 'collected';
   sprite: Sprite;
 
   constructor({ x, y }) {
-    this.initGoalSwitch({ x, y });
-    on(GameEvent.goalSwitchCollision, this.onGoalSwitchCollision);
+    this.initDoorSwitch({ x, y });
+    on(GameEvent.doorSwitchCollision, this.onDoorSwitchCollision);
   }
 
   cleanup(): void {
-    off(GameEvent.goalSwitchCollision, this.onGoalSwitchCollision);
+    off(GameEvent.doorSwitchCollision, this.onDoorSwitchCollision);
   }
-  onGoalSwitchCollision = ({ other }) => {
+  onDoorSwitchCollision = ({ other }) => {
     if (other instanceof Player) {
-      this.setState(GoalSwitchState.collected);
+      this.setState(DoorSwitchState.collected);
     }
   };
 
-  setState(state: GoalSwitchState) {
+  setState(state: DoorSwitchState) {
     if (this.state !== state) {
       this.state = state;
       switch (state) {
-        case GoalSwitchState.collected:
+        case DoorSwitchState.collected:
           this.sprite.currentAnimation =
             this.sprite.animations[this.ANIMATION_COLLECTED];
-          emit(GameEvent.openGoal);
+          emit(GameEvent.openDoor);
           break;
-        case GoalSwitchState.idle:
+        case DoorSwitchState.idle:
           this.sprite.currentAnimation =
             this.sprite.animations[this.ANIMATION_IDLE];
           break;
@@ -51,7 +42,7 @@ export class GoalSwitch implements IGameObject {
     }
   }
 
-  initGoalSwitch({ x, y }) {
+  initDoorSwitch({ x, y }) {
     load(
       'assets/platform_metroidvania/miscellaneous sprites/orb_anim_strip_6.png',
       'assets/platform_metroidvania/miscellaneous sprites/orb_collected_anim_strip_5.png'

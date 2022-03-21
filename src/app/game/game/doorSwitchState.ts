@@ -1,4 +1,4 @@
-export enum GoalSwitchState {
+export enum DoorSwitchState {
   idle,
   on,
   off,

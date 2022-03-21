@@ -1,4 +1,4 @@
-export enum GoalState {
+export enum DoorState {
   closed,
   opening,
   opened,
