@@ -20,7 +20,7 @@ export class LevelEditor {
   ctx: CanvasRenderingContext2D;
   tileEngine: TileEngine;
   editorControls: EditorControls;
-  constructor(level: ILevelData) {
+  constructor(private level: ILevelData) {
     const id = 'game';
     const { canvas } = init(id);
     canvas.oncontextmenu = function (e) {
@@ -30,8 +30,8 @@ export class LevelEditor {
     this.ctx = canvas.getContext('2d');
     initKeys();
     initPointer();
-    if (level) {
-      loadLevelFromObject(level).then(({ tileEngine, gameObjects }) => {
+    if (this.level) {
+      loadLevelFromObject(this.level).then(({ tileEngine, gameObjects }) => {
         this.initEditorLoop({ tileEngine, gameObjects });
       });
     }
@@ -77,9 +77,14 @@ export class LevelEditor {
     this.canvas.height = mapheight;
     this.canvas.width = mapwidth;
     this.ctx.scale(this.scale, this.scale);
-    this.editorControls = new EditorControls(this.canvas, this.tileEngine, {
-      scale: this.scale,
-    });
+    this.editorControls = new EditorControls(
+      this.canvas,
+      this.tileEngine,
+      this.level,
+      {
+        scale: this.scale,
+      }
+    );
 
     for (const key in gameObjects) {
       if (gameObjects.hasOwnProperty(key)) {

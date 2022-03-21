@@ -32,7 +32,6 @@ export class LevelEditorService {
         const lastLevelIndex = parseFloat(lastLevelIndexStr);
         for (let i = 0; i <= lastLevelIndex; i++) {
           const levelStr = this.getLocalItem(i);
-          console.log(levelStr);
           if (levelStr) {
             levels.push(JSON.parse(levelStr));
           }

@@ -1,4 +1,5 @@
 import {
+  GameObject,
   getPointer,
   offPointer,
   on,
@@ -9,10 +10,13 @@ import {
 } from 'kontra';
 import { EditorEvent } from './editorEvent';
 import { EditorTile } from './editorTile';
+import { getGameOjectKey } from './gameObjectFactory';
+import { GameObjectType } from './gameObjects';
 import { getCol, getMaxSxSy, getRow } from './gameUtils';
 import { IGameObject } from './iGameObject';
+import { ILevelData } from './iLevelData';
 
-type PointerState = 'panning' | 'idle' | 'drawing' | 'erasing';
+type PointerState = 'panning' | 'idle' | 'drawing' | 'erasing' | 'dragging';
 type Tool = 'block';
 type Brush = 'main';
 export class EditorControls {
@@ -26,10 +30,12 @@ export class EditorControls {
   pointerState: PointerState = 'panning';
   selectedTool: Tool = 'block';
   selectedTile = this.DELETE_TILE;
+  draggingObject;
   selectedBrush: Brush = 'main';
   altDragStartPos = { x: 0, y: 0 };
   currTileEngineSx = 0;
   currTileEngineSy = 0;
+  currPointerStart = { x: 0, y: 0 };
   maxSx = 0; // number of mapwidth pixels not inside the canvas
   maxSy = 0; // number of mapheight pixels not inside the canvas
   currCol = 0;
@@ -39,6 +45,7 @@ export class EditorControls {
   constructor(
     private canvas: HTMLCanvasElement,
     private tileEngine: TileEngine,
+    private level: ILevelData,
     { scale }
   ) {
     this.scale = scale;
@@ -71,6 +78,9 @@ export class EditorControls {
         break;
       case 'erasing':
         this.erase();
+        break;
+      case 'dragging':
+        this.doDragging();
         break;
       default:
     }
@@ -140,16 +150,27 @@ export class EditorControls {
 
   onPointerUp = (e) => {
     this.setPointerState('idle');
+
+    if (this.draggingObject) {
+      const key = getGameOjectKey(this.draggingObject);
+      this.updateLevelData(key, this.draggingObject.sprite);
+      this.draggingObject = null;
+    }
   };
 
-  onPointerDown = (e) => {
-    this.checkPointerDownObjects(e);
+  updateLevelData(key: GameObjectType, gameObj: GameObject) {
+    this.level.gameObjects[key].x = gameObj.x;
+    this.level.gameObjects[key].y = gameObj.y;
+  }
 
+  onPointerDown = (e) => {
     if (e.altKey && e.button === this.PRIMARY_BUTTON) {
       this.setPointerState('panning');
       this.currTileEngineSx = this.tileEngine.sx;
       this.currTileEngineSy = this.tileEngine.sy;
       this.altDragStartPos = { x: e.offsetX, y: e.offsetY };
+    } else if (this.checkPointerDownObjects(e)) {
+      this.setPointerState('dragging');
     } else if (e.button === this.PRIMARY_BUTTON) {
       this.setPointerState('drawing');
     } else if (e.button === this.SECONDARY_BUTTON) {
@@ -182,22 +203,25 @@ export class EditorControls {
     });
   }
 
-  /** takes sx and scale into account when checking for object */
-  checkPointerDownObjects(e) {
+  /** takes sx, sy and scale into account when checking for object */
+  checkPointerDownObjects(e): boolean {
+    console.log(e.offsetX + this.tileEngine.sx * this.scale);
     this.gos.forEach((go) => {
       if (
-        e.offsetX + this.tileEngine.sx <
+        e.offsetX + this.tileEngine.sx * this.scale <
           go.sprite.x * this.scale + go.sprite.width &&
-        e.offsetX + this.tileEngine.sx >
+        e.offsetX + this.tileEngine.sx * this.scale >
           go.sprite.x * this.scale - go.sprite.width &&
-        e.offsetY + this.tileEngine.sy <
+        e.offsetY + this.tileEngine.sy * this.scale <
           go.sprite.y * this.scale + go.sprite.height &&
-        e.offsetY + this.tileEngine.sy >
+        e.offsetY + this.tileEngine.sy * this.scale >
           go.sprite.y * this.scale - go.sprite.height
       ) {
-        console.log('found object', go);
+        this.currPointerStart = { x: e.offsetX, y: e.offsetY };
+        this.draggingObject = go;
       }
     });
+    return Boolean(this.draggingObject);
   }
 
   setMaxSxSy({ mapwidth, mapheight }) {
@@ -215,6 +239,11 @@ export class EditorControls {
     this.pointerState = state;
   }
 
+  doDragging() {
+    const p = getPointer();
+    this.draggingObject.sprite.x = p.x / this.scale + this.tileEngine.sx;
+    this.draggingObject.sprite.y = p.y / this.scale + this.tileEngine.sy;
+  }
   doPanning() {
     const p = getPointer();
     const sx = this.currTileEngineSx + (p.x - this.altDragStartPos.x) * -1;

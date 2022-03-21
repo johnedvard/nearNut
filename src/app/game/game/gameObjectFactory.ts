@@ -20,3 +20,15 @@ export const createGameObject = (key: string, data: any): IGameObject => {
       return new DoorSwitch({ ...data });
   }
 };
+
+export const getGameOjectKey = (go: IGameObject): GameObjectType => {
+  if (go instanceof Player) {
+    return 'player';
+  } else if (go instanceof Door) {
+    return 'door';
+  } else if (go instanceof DoorSwitch) {
+    return 'doorSwitch';
+  } else {
+    throw new Error('Not a valid type');
+  }
+};

@@ -94,9 +94,6 @@ export class Game {
     const mapheight = gameHeight;
     const mapwidth = gameWidth;
     // hack to fake tilengine width and height, making it possible to move the camera
-    console.log(tileEngine);
-    console.log(gameHeight);
-    console.log(gameWidth);
     tileEngine.mapwidth = tileEngine.width * tileEngine.tilewidth * scale;
     tileEngine.mapheight = tileEngine.height * tileEngine.tileheight * scale;
     this.canvas.height = Math.min(tileEngine.mapheight, mapheight);
