@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { LoginMenuComponent } from './login/login-menu/login-menu.component';
+import { SharedModule } from './shared/shared.module';
 
 const routes: Routes = [
   {
