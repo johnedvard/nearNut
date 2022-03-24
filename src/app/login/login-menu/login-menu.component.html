@@ -1,1 +1,2 @@
-<button mat-button>Login/out</button>
+<button mat-button *ngIf="!isSignedIn" (click)="login($event)">Login</button>
+<button mat-button *ngIf="isSignedIn" (click)="logout($event)">Logout</button>

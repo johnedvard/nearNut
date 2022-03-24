@@ -6,6 +6,7 @@ import { LevelEditorComponent } from './level-editor/level-editor.component';
 import { SharedModule } from '../shared/shared.module';
 import { LevelCardComponent } from './level-card/level-card.component';
 import { LevelToolbarComponent } from './level-toolbar/level-toolbar.component';
+import { LoginModule } from '../login/login.module';
 
 @NgModule({
   declarations: [
@@ -13,6 +14,6 @@ import { LevelToolbarComponent } from './level-toolbar/level-toolbar.component';
     LevelCardComponent,
     LevelToolbarComponent,
   ],
-  imports: [CommonModule, LevelEditorRoutingModule, SharedModule],
+  imports: [CommonModule, LevelEditorRoutingModule, SharedModule, LoginModule],
 })
 export class LevelEditorModule {}
