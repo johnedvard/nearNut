@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>Characters</h2>
+<mat-dialog-content class="mat-typography">
+  <h3>Title of selected character in list</h3>
+  <div>Here comes an image/animation, and some description</div>
+  <div>We alsio need a link to paras, and a way to purchase the character</div>
+
+  <div class="character-grid">
+    <div id="heroDefault">
+      <img
+        src="assets/platform_metroidvania/herochar sprites(new)/herochar_jump_up_anim.gif"
+      />
+    </div>
+    <div>
+      <img
+        src="https://ipfs.fleek.co/ipfs/bafybeia6ieq7vbjgirsoocsanieejtkwjrsx6gubs4bcdosa5ly73layyy"
+      />
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="center">
+  <button mat-button mat-dialog-close>X</button>
+  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>OK</button>
+</mat-dialog-actions>

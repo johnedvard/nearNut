@@ -43,7 +43,7 @@ export class NearService {
         }
         this.contract = await new Contract(account, this.CONTRACT_NAME, {
           // View methods are read only. They don't modify the state, but usually return some value.
-          viewMethods: ['nft_tokens_for_owner'],
+          viewMethods: ['nft_tokens_for_owner', 'nft_tokens_by_series'],
           // Change methods can modify the state. But you don't receive the returned value when called.
           changeMethods: [''],
         });
@@ -55,6 +55,12 @@ export class NearService {
   getNftTokensForOwner(account_id: string): Promise<string> {
     const args = { account_id };
     return (<any>this.contract).nft_tokens_for_owner(args).then((res: any) => {
+      console.log(res);
+    });
+  }
+  getNftTokensBySeries(token_series_id: string): Promise<string> {
+    const args = { token_series_id };
+    return (<any>this.contract).nft_tokens_by_series(args).then((res: any) => {
       console.log(res);
     });
   }
