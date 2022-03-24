@@ -28,6 +28,18 @@
 
 <div *ngIf="selectedLevel">
   <app-level-toolbar (backClick)="goBackToSelection()"> </app-level-toolbar>
+  <div *ngIf="state === 'editing'">
+    <div>"alt + mouse drag" inside grid to pan map</div>
+    <div>"mouse drag" to move objects</div>
+    <div>select tile and "draw" tiles with mouse</div>
+  </div>
+
+  <div *ngIf="state === 'playing'">
+    <div>reach the goal</div>
+    <div>click "space" to start</div>
+    <div>click "space" to restart after dying</div>
+  </div>
+
   <app-game
     [level]="selectedLevel"
     [isEditing]="state === 'editing'"
