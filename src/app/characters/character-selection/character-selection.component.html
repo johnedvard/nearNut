@@ -1,9 +1,24 @@
 <h2 mat-dialog-title>Characters</h2>
 <mat-dialog-content class="mat-typography">
-  <h3>Title of selected character in list</h3>
-  <div>Here comes an image/animation, and some description</div>
-  <div>We alsio need a link to paras, and a way to purchase the character</div>
+  <h3>{{ selectedCandidate.name }}</h3>
+  <div id="heroDescription">
+    <img [src]="selectedCandidate.imgSrc" />
+    <div>
+      {{ selectedCandidate.description }}
+      <div *ngIf="!selectedCandidate.isOwned">
+        Not owned.
+        <a
+          [href]="
+            'https://paras.id/token/x.paras.near::' + selectedCandidate.id
+          "
+        >
+          Buy NFT from Paras</a
+        >
+      </div>
+    </div>
+  </div>
 
+  <hr />
   <div class="character-grid">
     <div
       *ngFor="let character of characters; index as i"
@@ -11,7 +26,7 @@
       [id]="character.id"
       [ngClass]="{
         owned: character.isOwned,
-        selected: selectedCandidateId === character.id,
+        selected: selectedCandidate.id === character.id,
         current: currentCharId === character.id
       }"
     >
@@ -19,8 +34,8 @@
     </div>
   </div>
 </mat-dialog-content>
-<mat-dialog-actions align="center">
-  <button mat-button mat-dialog-close>X</button>
+<mat-dialog-actions align="left">
+  <button mat-button mat-dialog-close>Cancel</button>
   <button
     mat-button
     [mat-dialog-close]="true"
