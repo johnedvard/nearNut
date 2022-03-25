@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Account } from 'near-api-js';
-import { first, Subscription, take } from 'rxjs';
+import { first } from 'rxjs';
 import { NearService } from 'src/app/shared/near.service';
 import { NFT_SERIES_MIRROR_CRYSTALS } from 'src/app/shared/nearUtil';
 
@@ -11,8 +11,9 @@ import { NFT_SERIES_MIRROR_CRYSTALS } from 'src/app/shared/nearUtil';
   styleUrls: ['./character-selection.component.sass'],
 })
 export class CharacterSelectionComponent implements OnInit {
-  // TODO (johnedvard) read from localstorage to get last selected ID.
-  selectedCharId = 'heroDefault';
+  // TODO (johnedvard) read from localstorage (or contract) to get last selected ID.
+  selectedCandidateId = 'heroDefault'; // Candidate
+  currentCharId = 'heroDefault'; // Currently selected character,
   extraCharacters = [
     {
       id: NFT_SERIES_MIRROR_CRYSTALS,
@@ -34,23 +35,25 @@ export class CharacterSelectionComponent implements OnInit {
   }
   selectCharacter(character: { id: string; isOwned: boolean }) {
     if (character.isOwned) {
-      this.selectedCharId = character.id;
+      this.selectedCandidateId = character.id;
     } else {
-      console.log(
-        `Buy from https://paras.id/token/x.paras.near::${character.id}`
-      );
-      const toast = this.snackBar.open(
-        'Not owned',
-        `Buy character from Paras`,
-        {
-          duration: 3000,
-        }
-      );
+      const toast = this.snackBar.open('Not owned', 'Buy NFT from Paras', {
+        duration: 3000,
+      });
       toast
         .onAction()
         .pipe(first())
-        .subscribe(() => {});
+        .subscribe(() => {
+          window.open(
+            `https://paras.id/token/x.paras.near::${character.id}`,
+            'new'
+          );
+        });
     }
+  }
+  confirmSelection() {
+    this.currentCharId = this.selectedCandidateId;
+    // TODO (johnedvard) store to local storage (or contract)
   }
 
   private getNftCharacters() {

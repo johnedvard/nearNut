@@ -10,7 +10,8 @@
       id="heroDefault"
       [ngClass]="{
         owned: true,
-        selected: selectedCharId === 'heroDefault'
+        selected: selectedCandidateId === 'heroDefault',
+        current: currentCharId === 'heroDefault'
       }"
     >
       <img
@@ -23,7 +24,8 @@
       [id]="character.id"
       [ngClass]="{
         owned: character.isOwned,
-        selected: selectedCharId === character.id
+        selected: selectedCandidateId === character.id,
+        current: currentCharId === character.id
       }"
     >
       <img [src]="character.imgSrc" />
@@ -32,5 +34,12 @@
 </mat-dialog-content>
 <mat-dialog-actions align="center">
   <button mat-button mat-dialog-close>X</button>
-  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>OK</button>
+  <button
+    mat-button
+    [mat-dialog-close]="true"
+    cdkFocusInitial
+    (click)="confirmSelection()"
+  >
+    OK
+  </button>
 </mat-dialog-actions>
