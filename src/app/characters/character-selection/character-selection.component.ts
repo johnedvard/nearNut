@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Account } from 'near-api-js';
-import { first, Subscription } from 'rxjs';
+import { first, Subscription, take } from 'rxjs';
 import { NearService } from 'src/app/shared/near.service';
 import { NFT_SERIES_MIRROR_CRYSTALS } from 'src/app/shared/nearUtil';
 
@@ -22,7 +23,7 @@ export class CharacterSelectionComponent implements OnInit {
   ];
   account: Account;
 
-  constructor(private nearService: NearService) {
+  constructor(private nearService: NearService, private snackBar: MatSnackBar) {
     this.nearService
       .getAccount()
       .pipe(first())
@@ -35,7 +36,20 @@ export class CharacterSelectionComponent implements OnInit {
     if (character.isOwned) {
       this.selectedCharId = character.id;
     } else {
-      console.log('Cannot select character not owned. Buy it from Paras');
+      console.log(
+        `Buy from https://paras.id/token/x.paras.near::${character.id}`
+      );
+      const toast = this.snackBar.open(
+        'Not owned',
+        `Buy character from Paras`,
+        {
+          duration: 3000,
+        }
+      );
+      toast
+        .onAction()
+        .pipe(first())
+        .subscribe(() => {});
     }
   }
 
