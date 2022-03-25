@@ -6,20 +6,7 @@
 
   <div class="character-grid">
     <div
-      (click)="selectCharacter({ id: 'heroDefault', isOwned: true })"
-      id="heroDefault"
-      [ngClass]="{
-        owned: true,
-        selected: selectedCandidateId === 'heroDefault',
-        current: currentCharId === 'heroDefault'
-      }"
-    >
-      <img
-        src="assets/platform_metroidvania/herochar sprites(new)/herochar_jump_up_anim.gif"
-      />
-    </div>
-    <div
-      *ngFor="let character of extraCharacters; index as i"
+      *ngFor="let character of characters; index as i"
       (click)="selectCharacter(character)"
       [id]="character.id"
       [ngClass]="{
