@@ -15,6 +15,11 @@
   div
     width: 64px
     height: 64px
+    cursor: pointer
+    &:not(.owned)
+      filter: grayscale(1) contrast(2)
+    &.selected
+      border: 2px solid white
 
 img
   width: 128px

@@ -5,15 +5,28 @@
   <div>We alsio need a link to paras, and a way to purchase the character</div>
 
   <div class="character-grid">
-    <div id="heroDefault">
+    <div
+      (click)="selectCharacter({ id: 'heroDefault', isOwned: true })"
+      id="heroDefault"
+      [ngClass]="{
+        owned: true,
+        selected: selectedCharId === 'heroDefault'
+      }"
+    >
       <img
         src="assets/platform_metroidvania/herochar sprites(new)/herochar_jump_up_anim.gif"
       />
     </div>
-    <div>
-      <img
-        src="https://ipfs.fleek.co/ipfs/bafybeia6ieq7vbjgirsoocsanieejtkwjrsx6gubs4bcdosa5ly73layyy"
-      />
+    <div
+      *ngFor="let character of extraCharacters; index as i"
+      (click)="selectCharacter(character)"
+      [id]="character.id"
+      [ngClass]="{
+        owned: character.isOwned,
+        selected: selectedCharId === character.id
+      }"
+    >
+      <img [src]="character.imgSrc" />
     </div>
   </div>
 </mat-dialog-content>

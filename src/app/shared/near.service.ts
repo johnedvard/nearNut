@@ -58,10 +58,11 @@ export class NearService {
       console.log(res);
     });
   }
-  getNftTokensBySeries(token_series_id: string): Promise<string> {
+  getNftTokensBySeries(token_series_id: string): Promise<any[]> {
     const args = { token_series_id };
     return (<any>this.contract).nft_tokens_by_series(args).then((res: any) => {
       console.log(res);
+      return res;
     });
   }
 
