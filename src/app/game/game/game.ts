@@ -174,12 +174,20 @@ export class Game {
 
   checkTileMapCollision(go: IGameObject) {
     if (this.tileEngine && go.sprite) {
+      const collisionBox = {
+        x: go.sprite.x,
+        y: go.sprite.y,
+        width: 5,
+        height: 5,
+        anchor: go.sprite.anchor,
+      };
+
       const isCollision = this.tileEngine.layerCollidesWith(
         'ground',
-        go.sprite
+        collisionBox
       );
       if (isCollision) {
-        const tile = this.tileEngine.tileAtLayer('ground', { ...go.sprite });
+        const tile = this.tileEngine.tileAtLayer('ground', { ...collisionBox });
         const isTileCollision = this.checkTileCollision(go, tile);
         if (isTileCollision) {
           emit(GameEvent.hitWall, { go });

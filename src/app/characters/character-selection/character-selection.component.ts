@@ -17,8 +17,7 @@ export class CharacterSelectionComponent implements OnInit {
   extraCharacters = [
     {
       id: NFT_SERIES_MIRROR_CRYSTALS,
-      imgSrc:
-        'https://ipfs.fleek.co/ipfs/bafybeia6ieq7vbjgirsoocsanieejtkwjrsx6gubs4bcdosa5ly73layyy',
+      imgSrc: 'assets/mirror_crystals/MirrorCrystalsHero16x16.png',
       isOwned: false,
     },
   ];

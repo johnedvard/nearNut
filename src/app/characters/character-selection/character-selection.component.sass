@@ -13,24 +13,20 @@
   margin-top: 18px
 
   div
+    padding: 8px
     width: 64px
     height: 64px
     cursor: pointer
+    border-radius: 4px
     &:not(.owned)
       filter: grayscale(1) contrast(2)
     &.selected
-      border: 2px solid white
+      outline: 2px solid white
     &.current
       background: gold
 
 img
-  width: 128px
-  height: auto
-  margin: -32px
   image-rendering: pixelated
-
-#heroDefault
-  img
-    margin: 0
-    width: 100%
-    height: auto
+  margin: 0
+  width: 100%
+  height: auto
