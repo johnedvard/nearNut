@@ -29,6 +29,7 @@ import { Player } from './player';
 import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 import { gameHeight, gameWidth } from './gameSettings';
+import { Goal } from './goal';
 
 export class Game {
   private state: GameState = GameState.loading;
@@ -42,6 +43,7 @@ export class Game {
   player: Player;
   door: Door;
   doorSwitch: DoorSwitch;
+  goal: Goal;
   maxSx = 0;
   maxSy = 0;
   constructor();
@@ -124,6 +126,7 @@ export class Game {
         this.checkTileMapCollision(this.player);
         this.checkDoorSwitchColllision(this.player);
         this.checkDoorCollision(this.player);
+        this.checkGoalCOllision(this.player);
       },
       render: () => {
         if (this.ctx.imageSmoothingEnabled) {
@@ -144,11 +147,14 @@ export class Game {
       this.tileEngine.remove(this.door);
       this.tileEngine.remove(this.doorSwitch);
       this.tileEngine.remove(this.player);
+      this.tileEngine.remove(this.goal);
       this.initPlayer(gameObjects.player);
       this.initDoor(gameObjects.door);
       this.initDoorSwitch(gameObjects.doorSwitch);
+      this.initGoal(gameObjects.goal);
       this.tileEngine.add(this.door);
       this.tileEngine.add(this.doorSwitch);
+      this.tileEngine.add(this.goal);
       this.tileEngine.add(this.player);
     }
   }
@@ -217,6 +223,13 @@ export class Game {
       }
     }
   }
+  checkGoalCOllision(go: IGameObject) {
+    if (this.goal && go.sprite) {
+      if (rectCollision(this.goal.sprite, go.sprite)) {
+        emit(GameEvent.goalCollision, { other: go });
+      }
+    }
+  }
 
   resetGame() {
     this.initGame(this.gameObjects);
@@ -236,6 +249,9 @@ export class Game {
   }
   initDoorSwitch({ x, y }) {
     this.doorSwitch = new DoorSwitch({ x, y });
+  }
+  initGoal({ x, y }) {
+    this.goal = new Goal({ x, y });
   }
   startGame() {
     switch (this.state) {

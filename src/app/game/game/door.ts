@@ -29,9 +29,11 @@ export class Door implements IGameObject {
       switch (this.state) {
         case DoorState.opened:
         case DoorState.opening:
-          emit(GameEvent.levelComplete);
+          // Do nothing, pass through
           break;
         case DoorState.closed:
+          // TODO (johnedvard) change to GameEvent.hitDoor?
+          emit(GameEvent.hitWall, { go: other });
           break;
         default:
       }

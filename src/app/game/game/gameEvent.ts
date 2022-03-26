@@ -8,6 +8,7 @@ export enum GameEvent {
   newGame = 'newGame',
   openDoor = 'openDoor',
   doorCollision = 'doorCollision',
+  goalCollision = 'goalCollision',
   doorSwitchCollision = 'doorSwitchcollision',
   levelComplete = 'levelComplete',
 }

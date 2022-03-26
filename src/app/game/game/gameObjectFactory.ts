@@ -3,6 +3,7 @@ import { Door } from './door';
 import { DoorSwitch } from './doorSwitch';
 import { IGameObject } from './iGameObject';
 import { Player } from './player';
+import { Goal } from './goal';
 
 /**
  * Remember to support old keys when modifying the types,
@@ -18,6 +19,10 @@ export const createGameObject = (key: string, data: any): IGameObject => {
       return new Door({ ...data });
     case 'doorSwitch':
       return new DoorSwitch({ ...data });
+    case 'goal':
+      return new Goal({ ...data });
+    default:
+      throw new Error('Not a valid game object type');
   }
 };
 
@@ -28,6 +33,8 @@ export const getGameOjectKey = (go: IGameObject): GameObjectType => {
     return 'door';
   } else if (go instanceof DoorSwitch) {
     return 'doorSwitch';
+  } else if (go instanceof Goal) {
+    return 'goal';
   } else {
     throw new Error('Not a valid type');
   }
