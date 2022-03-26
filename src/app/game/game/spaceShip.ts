@@ -76,7 +76,6 @@ export class SpaceShip implements IGameObject {
             frames: '0..7',
             frameRate: 10,
           },
-          [PlayerAnimation.celebrate]: {},
         },
       });
 
