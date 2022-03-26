@@ -74,8 +74,8 @@ export class LevelEditor {
     // hack to fake tilengine width and height, making it possible to move the camera
     tileEngine.mapwidth = tileEngine.width * tileEngine.tilewidth * scale;
     tileEngine.mapheight = tileEngine.height * tileEngine.tileheight * scale;
-    this.canvas.height = mapheight;
-    this.canvas.width = mapwidth;
+    this.canvas.height = Math.min(tileEngine.mapheight, mapheight);
+    this.canvas.width = Math.min(tileEngine.mapwidth, mapwidth);
     this.ctx.scale(this.scale, this.scale);
     this.editorControls = new EditorControls(
       this.canvas,

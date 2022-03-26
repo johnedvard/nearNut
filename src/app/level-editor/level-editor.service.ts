@@ -90,8 +90,8 @@ export class LevelEditorService {
       name: '' + levelIndex,
       tilewidth: 32,
       tileheight: 32,
-      width: 200,
-      height: 200,
+      width: 80,
+      height: 80,
       tilesets: [{}],
       layers: [
         {
