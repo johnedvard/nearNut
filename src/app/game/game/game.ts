@@ -71,10 +71,6 @@ export class Game {
         this.initGameLoop({ tileEngine, gameObjects });
       });
     }
-
-    on(GameEvent.startGame, this.onStartGame);
-    on(GameEvent.playerStateChange, this.onPlayerStateChange);
-    on(GameEvent.levelComplete, this.onLevelComplete);
   }
 
   cleanup() {
@@ -161,6 +157,10 @@ export class Game {
       }
       this.tileEngine.add(this.player);
     }
+
+    on(GameEvent.startGame, this.onStartGame);
+    on(GameEvent.playerStateChange, this.onPlayerStateChange);
+    on(GameEvent.levelComplete, this.onLevelComplete);
   }
 
   onLevelComplete = () => {
@@ -236,6 +236,7 @@ export class Game {
   }
 
   resetGame() {
+    this.cleanup();
     this.initGame(this.gameObjects);
     this.setState(GameState.ready);
   }
