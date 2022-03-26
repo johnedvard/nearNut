@@ -4,12 +4,12 @@ import { MonetizeEvent } from 'src/app/shared/monetizeEvent';
 
 import { GameEvent } from './gameEvent';
 import { IGameObject } from './iGameObject';
+import { PlayerAnimation } from './playerAnimation';
 import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 import { spaceShipRenderers } from './spaceShipRenderers';
 
 export class SpaceShip implements IGameObject {
-  ANIMATION_TRACING = 'tracing';
   sprite: Sprite;
   rightKey = 'right';
   leftKey = 'left';
@@ -43,6 +43,9 @@ export class SpaceShip implements IGameObject {
     off(MonetizeEvent.progress, this.onMonetizeProgress);
   }
 
+  setAnimation(animation: PlayerAnimation) {
+    this.sprite.currentAnimation = this.sprite.animations[animation];
+  }
   update(dt: number): void {
     if (this.sprite) {
       this.sprite.update(dt);
@@ -65,10 +68,15 @@ export class SpaceShip implements IGameObject {
         frameWidth: 16,
         frameHeight: 16,
         animations: {
-          [this.ANIMATION_TRACING]: {
+          [PlayerAnimation.tracing]: {
             frames: '56..58',
             frameRate: 6,
           },
+          [PlayerAnimation.dead]: {
+            frames: '0..7',
+            frameRate: 10,
+          },
+          [PlayerAnimation.celebrate]: {},
         },
       });
 
@@ -116,6 +124,17 @@ export class SpaceShip implements IGameObject {
   onPlayerStateChange = (evt: PlayerStateChangeEvent) => {
     if (evt.ship === this) {
       this.playerState = evt.state;
+      switch (this.playerState) {
+        case PlayerState.dead:
+          this.setAnimation(PlayerAnimation.dead);
+          this.sprite.currentAnimation.loop = false;
+          break;
+        case PlayerState.tracing:
+          this.setAnimation(PlayerAnimation.tracing);
+          break;
+        default:
+          this.setAnimation(PlayerAnimation.tracing);
+      }
     }
   };
 

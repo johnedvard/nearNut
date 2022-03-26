@@ -8,6 +8,7 @@ import { IGameObject } from './iGameObject';
 import { PlayerState } from './playerState';
 import { GameEvent } from './gameEvent';
 import { SpaceShip } from './spaceShip';
+import { PlayerAnimation } from './playerAnimation';
 
 class Player implements IGameObject {
   sprite: Sprite;
