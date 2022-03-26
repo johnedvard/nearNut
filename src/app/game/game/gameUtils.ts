@@ -14,6 +14,7 @@ export const getPlayerControls = (): string[] => {
 };
 
 export function rectCollision(rect: GameObject, other: GameObject) {
+  if (!rect && !other) return false;
   return (
     rect.x < other.x + other.width &&
     rect.x + rect.width > other.x &&
