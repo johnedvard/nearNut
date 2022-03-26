@@ -30,6 +30,7 @@ import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 import { gameHeight, gameWidth } from './gameSettings';
 import { Goal } from './goal';
+import { createGameObject } from './gameObjectFactory';
 
 export class Game {
   private state: GameState = GameState.loading;
@@ -41,9 +42,6 @@ export class Game {
   tileEngine: TileEngine;
   ctx: CanvasRenderingContext2D;
   player: Player;
-  door: Door;
-  doorSwitch: DoorSwitch;
-  goal: Goal;
   maxSx = 0;
   maxSy = 0;
   constructor();
@@ -77,9 +75,7 @@ export class Game {
     off(GameEvent.startGame, this.onStartGame);
     off(GameEvent.playerStateChange, this.onPlayerStateChange);
     off(GameEvent.levelComplete, this.onLevelComplete);
-    this.player.cleanup();
-    this.door.cleanup();
-    this.doorSwitch.cleanup();
+
     this.gos.forEach((go) => go.cleanup());
   }
 
@@ -105,24 +101,22 @@ export class Game {
     this.maxSx = maxSx;
     this.maxSy = maxSy;
     this.ctx.scale(this.scale, this.scale);
-    this.tileEngine.add(this.door);
-    this.tileEngine.add(this.doorSwitch);
-    this.tileEngine.add(this.player);
 
     this.initGame(gameObjects);
     this.loop = GameLoop({
       update: (dt: number) => {
-        this.player.update(dt);
-        this.door.update(dt);
-        this.doorSwitch.update(dt);
         this.gos.forEach((go: any) => {
           go.update(dt);
+          if (go instanceof DoorSwitch) {
+            this.checkDoorSwitchColllision(go, this.player);
+          } else if (go instanceof Door) {
+            this.checkDoorCollision(go, this.player);
+          } else if (go instanceof Goal) {
+            this.checkGoalCollision(go, this.player);
+          }
         });
-        this.checkCameraControls();
         this.checkTileMapCollision(this.player);
-        this.checkDoorSwitchColllision(this.player);
-        this.checkDoorCollision(this.player);
-        this.checkGoalCOllision(this.player);
+        this.checkCameraControls();
       },
       render: () => {
         if (this.ctx.imageSmoothingEnabled) {
@@ -131,31 +125,25 @@ export class Game {
         if (this.tileEngine) {
           this.tileEngine.render();
         }
-        this.gos.forEach((go: any) => {
-          go.render();
-        });
       },
     });
     this.loop.start();
   }
   initGame(gameObjects: GameObjects) {
     if (this.tileEngine) {
-      this.tileEngine.remove(this.door);
-      this.tileEngine.remove(this.doorSwitch);
-      this.tileEngine.remove(this.player);
-      this.tileEngine.remove(this.goal);
-      this.initPlayer(gameObjects.player);
-      this.initDoor(gameObjects.door);
-      this.initDoorSwitch(gameObjects.doorSwitch);
-      if (gameObjects.goal) {
-        this.initGoal(gameObjects.goal);
+      this.gos.forEach((go) => {
+        this.tileEngine.remove(go);
+      });
+      for (const key in gameObjects) {
+        if (gameObjects.hasOwnProperty(key)) {
+          const gameObj = createGameObject(key, { ...gameObjects[key] });
+          if (gameObj instanceof Player) {
+            this.player = gameObj;
+          }
+          this.gos.push(gameObj);
+          this.tileEngine.add(gameObj);
+        }
       }
-      this.tileEngine.add(this.door);
-      this.tileEngine.add(this.doorSwitch);
-      if (this.goal) {
-        this.tileEngine.add(this.goal);
-      }
-      this.tileEngine.add(this.player);
     }
 
     on(GameEvent.startGame, this.onStartGame);
@@ -212,24 +200,24 @@ export class Game {
     return true;
   }
 
-  checkDoorSwitchColllision(go: IGameObject) {
-    if (this.doorSwitch && go.sprite) {
-      if (rectCollision(this.doorSwitch.sprite, go.sprite)) {
+  checkDoorSwitchColllision(doorSwitch: DoorSwitch, go: IGameObject) {
+    if (doorSwitch && go.sprite) {
+      if (rectCollision(doorSwitch.sprite, go.sprite)) {
         emit(GameEvent.doorSwitchCollision, { other: go });
       }
     }
   }
 
-  checkDoorCollision(go: IGameObject) {
-    if (this.door && go.sprite) {
-      if (rectCollision(this.door.sprite, go.sprite)) {
+  checkDoorCollision(door: Door, go: IGameObject) {
+    if (door && go.sprite) {
+      if (rectCollision(door.sprite, go.sprite)) {
         emit(GameEvent.doorCollision, { other: go });
       }
     }
   }
-  checkGoalCOllision(go: IGameObject) {
-    if (this.goal && go.sprite) {
-      if (rectCollision(this.goal.sprite, go.sprite)) {
+  checkGoalCollision(goal: Goal, go: IGameObject) {
+    if (goal && go.sprite) {
+      if (rectCollision(goal.sprite, go.sprite)) {
         emit(GameEvent.goalCollision, { other: go });
       }
     }
@@ -241,23 +229,6 @@ export class Game {
     this.setState(GameState.ready);
   }
 
-  initPlayer({ x, y }) {
-    this.player = new Player({
-      color: '#00ff00',
-      x: x,
-      y: y,
-    });
-  }
-
-  initDoor({ x, y }) {
-    this.door = new Door({ x, y });
-  }
-  initDoorSwitch({ x, y }) {
-    this.doorSwitch = new DoorSwitch({ x, y });
-  }
-  initGoal({ x, y }) {
-    this.goal = new Goal({ x, y });
-  }
   startGame() {
     switch (this.state) {
       case GameState.ready:
