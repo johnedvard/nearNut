@@ -272,6 +272,7 @@ export class Game {
   }
 
   checkCameraControls() {
+    if (!this.player.sprite) return;
     const pan = (key, max, cameraDiff) => {
       let camPos = this.tileEngine[key];
       if (cameraDiff > 140) {
