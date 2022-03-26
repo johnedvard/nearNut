@@ -151,10 +151,14 @@ export class Game {
       this.initPlayer(gameObjects.player);
       this.initDoor(gameObjects.door);
       this.initDoorSwitch(gameObjects.doorSwitch);
-      this.initGoal(gameObjects.goal);
+      if (gameObjects.goal) {
+        this.initGoal(gameObjects.goal);
+      }
       this.tileEngine.add(this.door);
       this.tileEngine.add(this.doorSwitch);
-      this.tileEngine.add(this.goal);
+      if (this.goal) {
+        this.tileEngine.add(this.goal);
+      }
       this.tileEngine.add(this.player);
     }
   }
