@@ -14,7 +14,9 @@ export class SelectCharacterComponent implements OnInit {
   ngOnInit(): void {}
 
   openCharacterSelection() {
-    const dialogRef = this.dialog.open(CharacterSelectionComponent);
+    const dialogRef = this.dialog.open(CharacterSelectionComponent, {
+      width: '80vw',
+    });
 
     dialogRef.afterClosed().subscribe((result) => {
       console.log(`Dialog result: ${result}`);
