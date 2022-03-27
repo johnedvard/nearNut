@@ -65,19 +65,25 @@ class Player implements IGameObject {
     if (this.spaceShip) {
       this.spaceShip.update(dt);
     }
-    this.updateEngineEffect(dt);
-    this.updateDeadPlayer();
-
+    if (
+      this.playerState !== PlayerState.dead &&
+      this.playerState !== PlayerState.idle
+    ) {
+      this.updateEngineEffect(dt);
+    }
     this.updateStateAfterAnimation(dt);
-
     this.playerControls();
   }
   render(): void {
     if (this.spaceShip) {
       this.spaceShip.render();
     }
-    this.effect.render();
-    this.renderDeadPlayer();
+    if (
+      this.playerState !== PlayerState.dead &&
+      this.playerState !== PlayerState.idle
+    ) {
+      this.effect.render();
+    }
   }
 
   updateStateAfterAnimation(dt: number) {
@@ -123,18 +129,6 @@ class Player implements IGameObject {
       this.setPlayerState(PlayerState.dead);
     }
   };
-
-  updateDeadPlayer() {
-    if (this.playerState === PlayerState.dead) {
-      // TODO create something nice
-    }
-  }
-
-  renderDeadPlayer() {
-    if (this.playerState === PlayerState.dead) {
-      // TODO create something nice
-    }
-  }
 
   setPlayerState(state: PlayerState) {
     if (this.playerState !== state) {

@@ -7,7 +7,6 @@ import { IGameObject } from './iGameObject';
 import { PlayerAnimation } from './playerAnimation';
 import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
-import { spaceShipRenderers } from './spaceShipRenderers';
 import { SwordWeapon } from './swordWeapon';
 import { Weapon } from './weapon';
 
@@ -16,7 +15,6 @@ export class SpaceShip implements IGameObject {
   rightKey = 'right';
   leftKey = 'left';
   spaceshipIndex = 0;
-  ships: any[] = [...spaceShipRenderers];
   rotating = false;
   isSubscriber = false;
   spaceShipSubject = new Subject<{ sprite: Sprite }>();
@@ -78,7 +76,7 @@ export class SpaceShip implements IGameObject {
             frameRate: 6,
           },
           [PlayerAnimation.dead]: {
-            frames: '0..7',
+            frames: [0, 1, 2, 3, 4, 5, 6, 7, 15], // the 15th frame is transparent
             frameRate: 10,
           },
           [PlayerAnimation.attack]: {
@@ -101,14 +99,16 @@ export class SpaceShip implements IGameObject {
           if (!this) return;
           this.currentAnimation.update(dt); // To draw animation
           this.rotation = this.rotation || 0;
-          if (keyPressed(spaceShip.leftKey)) {
-            this.rotation -= rotationSpeed * dt;
-            spaceShip.rotating = true;
-          } else if (keyPressed(spaceShip.rightKey)) {
-            this.rotation += rotationSpeed * dt;
-            spaceShip.rotating = true;
-          } else {
-            spaceShip.rotating = false;
+          if (spaceShip.playerState !== PlayerState.attacking) {
+            if (keyPressed(spaceShip.leftKey)) {
+              this.rotation -= rotationSpeed * dt;
+              spaceShip.rotating = true;
+            } else if (keyPressed(spaceShip.rightKey)) {
+              this.rotation += rotationSpeed * dt;
+              spaceShip.rotating = true;
+            } else {
+              spaceShip.rotating = false;
+            }
           }
 
           // move the ship forward in the direction it's facing
@@ -156,10 +156,4 @@ export class SpaceShip implements IGameObject {
         this.setAnimation(PlayerAnimation.tracing);
     }
   };
-
-  renderSpaceShip(sprite: Sprite, isSubscriber = false) {
-    if (this.playerState !== PlayerState.dead) {
-      spaceShipRenderers[this.spaceshipIndex](sprite, isSubscriber);
-    }
-  }
 }
