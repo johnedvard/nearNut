@@ -57,6 +57,7 @@ class Player implements IGameObject {
     off(GameEvent.hitWall, this.onHitWall);
     off(GameEvent.gameOver, this.onGameOver);
     off(MonetizeEvent.progress, this.onMonetizeProgress);
+    this.setPlayerState(PlayerState.idle);
     this.spaceShip.cleanup();
   }
 
