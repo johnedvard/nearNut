@@ -57,6 +57,7 @@ class Player implements IGameObject {
     off(GameEvent.hitWall, this.onHitWall);
     off(GameEvent.gameOver, this.onGameOver);
     off(MonetizeEvent.progress, this.onMonetizeProgress);
+    this.spaceShip.cleanup();
   }
 
   update(dt: number): void {
@@ -137,7 +138,7 @@ class Player implements IGameObject {
   setPlayerState(state: PlayerState) {
     if (this.playerState !== state) {
       this.playerState = state;
-      emit(GameEvent.playerStateChange, { state, ship: this.spaceShip });
+      emit(GameEvent.playerStateChange, { state });
       if (
         this.playerState === PlayerState.dead ||
         this.playerState === PlayerState.idle

@@ -8,17 +8,19 @@ import { PlayerAnimation } from './playerAnimation';
 import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 import { spaceShipRenderers } from './spaceShipRenderers';
+import { SwordWeapon } from './swordWeapon';
+import { Weapon } from './weapon';
 
 export class SpaceShip implements IGameObject {
   sprite: Sprite;
   rightKey = 'right';
   leftKey = 'left';
-  weaponKey = 'up';
   spaceshipIndex = 0;
   ships: any[] = [...spaceShipRenderers];
   rotating = false;
   isSubscriber = false;
   spaceShipSubject = new Subject<{ sprite: Sprite }>();
+  weapon: Weapon;
   constructor(
     private playerState: PlayerState,
     props: {
@@ -31,7 +33,7 @@ export class SpaceShip implements IGameObject {
   ) {
     this.rightKey = props.rightKey || this.rightKey;
     this.leftKey = props.leftKey || this.leftKey;
-    this.weaponKey = props.weaponKey || this.weaponKey;
+    this.weapon = new SwordWeapon();
 
     this.initSpaceShip(props.spriteProps);
     on(GameEvent.playerStateChange, this.onPlayerStateChange);
@@ -41,6 +43,7 @@ export class SpaceShip implements IGameObject {
   cleanup(): void {
     off(GameEvent.playerStateChange, this.onPlayerStateChange);
     off(MonetizeEvent.progress, this.onMonetizeProgress);
+    this.weapon.cleanup();
   }
 
   setAnimation(animation: PlayerAnimation) {
@@ -48,11 +51,13 @@ export class SpaceShip implements IGameObject {
   }
   update(dt: number): void {
     if (this.sprite) {
+      this.weapon.update(dt);
       this.sprite.update(dt);
     }
   }
   render(): void {
     if (this.sprite) {
+      this.weapon.render();
       this.sprite.render();
     }
   }
@@ -77,7 +82,7 @@ export class SpaceShip implements IGameObject {
             frameRate: 10,
           },
           [PlayerAnimation.attack]: {
-            frames: '111..117',
+            frames: '24..27',
             frameRate: 20,
           },
         },
@@ -127,25 +132,28 @@ export class SpaceShip implements IGameObject {
   };
 
   onPlayerStateChange = (evt: PlayerStateChangeEvent) => {
-    if (evt.ship === this) {
-      this.playerState = evt.state;
-      switch (this.playerState) {
-        case PlayerState.dead:
-          this.setAnimation(PlayerAnimation.dead);
-          this.sprite.currentAnimation.loop = false;
-          break;
-        case PlayerState.tracing:
-          this.setAnimation(PlayerAnimation.tracing);
-          break;
-        case PlayerState.attacking:
-          this.setAnimation(PlayerAnimation.attack);
-          this.sprite.currentAnimation.loop = true;
-          this.sprite.currentAnimation.reset();
-          this.sprite.currentAnimation.loop = false;
-          break;
-        default:
-          this.setAnimation(PlayerAnimation.tracing);
-      }
+    this.playerState = evt.state;
+    switch (this.playerState) {
+      case PlayerState.dead:
+        this.setAnimation(PlayerAnimation.dead);
+        this.sprite.currentAnimation.loop = false;
+        break;
+      case PlayerState.tracing:
+        this.setAnimation(PlayerAnimation.tracing);
+        break;
+      case PlayerState.attacking:
+        this.setAnimation(PlayerAnimation.attack);
+        this.weapon.attack({
+          x: this.sprite.x,
+          y: this.sprite.y,
+          rotation: this.sprite.rotation,
+        });
+        this.sprite.currentAnimation.loop = true;
+        this.sprite.currentAnimation.reset();
+        this.sprite.currentAnimation.loop = false;
+        break;
+      default:
+        this.setAnimation(PlayerAnimation.tracing);
     }
   };
 
