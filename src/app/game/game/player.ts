@@ -3,7 +3,7 @@ import { MonetizeEvent } from 'src/app/shared/monetizeEvent';
 import { Game } from './game';
 import { getPlayerControls, isOutOfBounds } from './gameUtils';
 import { EngineParticleEffect } from './engineParticleEffect';
-import { emit, off, on, Sprite, Vector } from 'kontra';
+import { emit, keyPressed, off, on, Sprite, Vector } from 'kontra';
 import { IGameObject } from './iGameObject';
 import { PlayerState } from './playerState';
 import { GameEvent } from './gameEvent';
@@ -18,6 +18,9 @@ class Player implements IGameObject {
   speed = 100;
   effect: EngineParticleEffect;
   rotating = false;
+  prevState: PlayerState;
+  currAnimationDuration = 0;
+  currAnimationTimeLapsed = 0;
   constructor(
     private playerProps: {
       color: string;
@@ -62,6 +65,10 @@ class Player implements IGameObject {
     }
     this.updateEngineEffect(dt);
     this.updateDeadPlayer();
+
+    this.updateStateAfterAnimation(dt);
+
+    this.playerControls();
   }
   render(): void {
     if (this.spaceShip) {
@@ -69,6 +76,30 @@ class Player implements IGameObject {
     }
     this.effect.render();
     this.renderDeadPlayer();
+  }
+
+  updateStateAfterAnimation(dt: number) {
+    if (this.currAnimationDuration) {
+      this.currAnimationTimeLapsed += dt * 1000;
+      if (this.currAnimationTimeLapsed >= this.currAnimationDuration) {
+        this.currAnimationDuration = 0;
+        this.currAnimationTimeLapsed = 0;
+        this.setPlayerState(this.prevState);
+      }
+    }
+  }
+  playerControls() {
+    if (keyPressed('space')) {
+      if (this.playerState === PlayerState.tracing) {
+        this.prevState = this.playerState;
+        // TODO (johnedvard) calc animation duration based on framerate
+        this.currAnimationDuration = 200;
+        this.setPlayerState(PlayerState.attacking);
+
+        // this.sprite.dx = attackSpeed;
+        // this.sprite.dy = attackSpeed;
+      }
+    }
   }
 
   onStartTrace = () => {

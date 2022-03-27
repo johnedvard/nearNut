@@ -76,6 +76,10 @@ export class SpaceShip implements IGameObject {
             frames: '0..7',
             frameRate: 10,
           },
+          [PlayerAnimation.attack]: {
+            frames: '111..117',
+            frameRate: 20,
+          },
         },
       });
 
@@ -85,7 +89,9 @@ export class SpaceShip implements IGameObject {
         height: 16,
         width: 16,
         anchor: { x: 0.5, y: 0.5 },
-        animations: spriteSheet.animations,
+        animations: {
+          ...spriteSheet.animations,
+        },
         update: function (dt: number) {
           if (!this) return;
           this.currentAnimation.update(dt); // To draw animation
@@ -130,6 +136,12 @@ export class SpaceShip implements IGameObject {
           break;
         case PlayerState.tracing:
           this.setAnimation(PlayerAnimation.tracing);
+          break;
+        case PlayerState.attacking:
+          this.setAnimation(PlayerAnimation.attack);
+          this.sprite.currentAnimation.loop = true;
+          this.sprite.currentAnimation.reset();
+          this.sprite.currentAnimation.loop = false;
           break;
         default:
           this.setAnimation(PlayerAnimation.tracing);
