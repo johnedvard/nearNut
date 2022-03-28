@@ -1,5 +1,12 @@
 <div class="container" *ngIf="!isPlayingLevel">
   <button mat-button routerLink="/">Back</button>
+  <div>
+    - TODO create more levels, and use smart-contract to track cleared levels,
+    and unlock levels
+  </div>
+  <div>- First row (1) of levels doesn't require login</div>
+  <div>- TODO add row with levels requirubg NEAR login to play</div>
+  <div>- TODO add levels for Coil subscribers to play</div>
   <app-level-selection
     (selectLevel)="onLevelSelect($event)"
   ></app-level-selection>
