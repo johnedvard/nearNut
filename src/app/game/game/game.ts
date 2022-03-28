@@ -51,7 +51,7 @@ export class Game {
    * Load level, create game objects
    * @param id canvas ID
    */
-  constructor(idOrLevel?: string | ILevelData, levelName: string = '001') {
+  constructor(idOrLevel?: string | ILevelData) {
     const id = 'game';
     const { canvas } = init(id);
     this.canvas = canvas;
@@ -65,9 +65,11 @@ export class Game {
         }
       );
     } else {
-      loadLevelFromFile(levelName).then(({ tileEngine, gameObjects }) => {
-        this.initGameLoop({ tileEngine, gameObjects });
-      });
+      loadLevelFromFile(<string>idOrLevel).then(
+        ({ tileEngine, gameObjects }) => {
+          this.initGameLoop({ tileEngine, gameObjects });
+        }
+      );
     }
   }
 

@@ -17,6 +17,7 @@ import { LevelEditor } from './levelEditor';
 })
 export class GameComponent implements OnInit, OnDestroy, OnChanges {
   @Input() level: ILevelData;
+  @Input() levelId;
   @Input() isEditing = false;
   game: Game;
   levelEditor: LevelEditor;
@@ -44,7 +45,11 @@ export class GameComponent implements OnInit, OnDestroy, OnChanges {
     if (this.isEditing) {
       this.levelEditor = new LevelEditor(this.level);
     } else {
-      this.game = new Game(this.level);
+      if (this.level) {
+        this.game = new Game(this.level);
+      } else if (this.levelId) {
+        this.game = new Game(this.levelId);
+      }
     }
   }
   cleanup(wasEditing: boolean) {

@@ -1,3 +1,9 @@
-<div *ngFor="let level of levels">
-  <button mat-button (click)="selectLevel(level)">{{ level.id }}</button>
+<div *ngFor="let level of levels; index as i">
+  <button
+    mat-raised-button
+    (click)="levelClick($event, level)"
+    [ngClass]="{ cleared: level.isCleared, disabled: !level.isUnlocked }"
+  >
+    {{ level.name }}
+  </button>
 </div>

@@ -1,5 +1,19 @@
+@use 'src/common'
+
 :host
   display: grid
-  grid-template-columns: repeat(5, 1fr)
-  grid-auto-flow: column
+  grid-template-columns: 1fr 1fr 1fr 1fr
   justify-items: center
+  align-content: center
+  gap: 32px
+  margin: 0px 64px
+  height: 100%
+
+button
+  &.disabled
+    background-color: rgba(255,255,255,.12)
+    color: rgba(255,255,255,.3)
+    box-shadow: none
+
+  &.cleared
+    outline: 2px solid common.$primary-foreground

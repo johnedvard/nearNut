@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { IStoryLevelMetaData } from '../i-story-level-meta-data';
 
 @Component({
   selector: 'app-level-selection',
@@ -6,18 +8,77 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./level-selection.component.sass'],
 })
 export class LevelSelectionComponent implements OnInit {
-  levels = [
-    { id: '001' },
-    { id: '002' },
-    { id: '003' },
-    { id: '004' },
-    { id: '005' },
+  @Output() selectLevel = new EventEmitter<string>();
+
+  levels: IStoryLevelMetaData[] = [
+    {
+      id: '005',
+      name: '1-5',
+      isCleared: false,
+      isUnlocked: false,
+      isMotizedContent: false,
+    },
+    {
+      id: '006',
+      name: '1-6',
+      isCleared: false,
+      isUnlocked: false,
+      isMotizedContent: false,
+    },
+    {
+      id: '007',
+      name: '1-7',
+      isCleared: false,
+      isUnlocked: false,
+      isMotizedContent: false,
+    },
+    {
+      id: '008',
+      name: '1-8',
+      isCleared: false,
+      isUnlocked: false,
+      isMotizedContent: false,
+    },
+    {
+      id: '001',
+      name: '1-1',
+      isCleared: true,
+      isUnlocked: true,
+      isMotizedContent: false,
+    },
+    {
+      id: '002',
+      name: '1-2',
+      isCleared: false,
+      isUnlocked: false,
+      isMotizedContent: false,
+    },
+    {
+      id: '003',
+      name: '1-3',
+      isCleared: false,
+      isUnlocked: false,
+      isMotizedContent: false,
+    },
+    {
+      id: '004',
+      name: '1-4',
+      isCleared: false,
+      isUnlocked: false,
+      isMotizedContent: false,
+    },
   ];
-  constructor() {}
+  constructor(private snackbar: MatSnackBar) {}
 
   ngOnInit(): void {}
 
-  selectLevel(level: any) {
-    console.log('open level', level);
+  levelClick(event: MouseEvent, level: IStoryLevelMetaData) {
+    if (!level.isUnlocked) {
+      this.snackbar.open('Clear previous levels to unlock', '', {
+        duration: 3000,
+      });
+      return;
+    }
+    this.selectLevel.emit(level.id);
   }
 }

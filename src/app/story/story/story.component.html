@@ -1,3 +1,11 @@
-<button mat-button routerLink="/">Back</button>
-<app-level-selection></app-level-selection>
+<div class="container" *ngIf="!isPlayingLevel">
+  <button mat-button routerLink="/">Back</button>
+  <app-level-selection
+    (selectLevel)="onLevelSelect($event)"
+  ></app-level-selection>
+</div>
+<div class="container" *ngIf="isPlayingLevel">
+  <button mat-button (click)="backClick()">Back</button>
+  <app-game [levelId]="selectedLevelId"></app-game>
+</div>
 <app-login-menu></app-login-menu>
