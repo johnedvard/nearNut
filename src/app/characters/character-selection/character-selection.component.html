@@ -7,12 +7,8 @@
       {{ selectedCandidate.description }}
       <div *ngIf="!selectedCandidate.isOwned">
         Not owned.
-        <a
-          [href]="
-            'https://paras.id/token/x.paras.near::' + selectedCandidate.id
-          "
-        >
-          Buy NFT from Paras</a
+        <a [href]="baseParasHref + selectedCandidate.id">
+          {{ buyFromParasStr }}</a
         >
       </div>
     </div>

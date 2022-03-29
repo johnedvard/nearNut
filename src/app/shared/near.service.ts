@@ -16,8 +16,8 @@ import { getNearConfig } from './nearConfig';
   providedIn: 'root',
 })
 export class NearService {
-  CONTRACT_NAME_DEV = 'nearnut.testnet';
-  CONTRACT_NAME_PROD = 'nearnut.near';
+  CONTRACT_NAME_TESTNET = 'nearnut.testnet';
+  CONTRACT_NAME_MAINNET = 'nearnut.near';
   APP_KEY_PREFIX = 'near-nut:';
   private near: Near;
   private readAccount: Account;
@@ -113,7 +113,7 @@ export class NearService {
     near: Near;
     walletConnection: WalletConnection | null;
   }> {
-    const env = environment.production ? 'production' : 'development';
+    const env = environment.mainnet ? 'mainnet' : 'testnet';
     const nearConfig = getNearConfig(env, this.APP_KEY_PREFIX);
     if (!this.near) {
       this.near = await connect(nearConfig);
@@ -126,8 +126,8 @@ export class NearService {
   }
 
   private getContractName() {
-    return environment.production
-      ? this.CONTRACT_NAME_PROD
-      : this.CONTRACT_NAME_DEV;
+    return environment.mainnet
+      ? this.CONTRACT_NAME_MAINNET
+      : this.CONTRACT_NAME_TESTNET;
   }
 }

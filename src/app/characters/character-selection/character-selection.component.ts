@@ -4,6 +4,7 @@ import { Account } from 'near-api-js';
 import { first } from 'rxjs';
 import { NearService } from 'src/app/shared/near.service';
 import { getMirrorCrystalSeries } from 'src/app/shared/nearUtil';
+import { environment } from 'src/environments/environment';
 import { ICharacter } from '../i-character';
 
 @Component({
@@ -12,6 +13,12 @@ import { ICharacter } from '../i-character';
   styleUrls: ['./character-selection.component.sass'],
 })
 export class CharacterSelectionComponent implements OnInit {
+  baseParasHref = environment.mainnet
+    ? 'https://paras.id/token/x.paras.near::'
+    : 'https://testnet.paras.id/token/paras-token-v2.testnet::';
+  buyFromParasStr = environment.mainnet
+    ? 'Buy from Paras'
+    : 'Buy from Paras (testnet)';
   DEFAULT_HERO_ID = 'heroDefault';
   characters: ICharacter[] = [
     {
