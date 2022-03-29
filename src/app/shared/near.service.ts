@@ -16,7 +16,8 @@ import { getNearConfig } from './nearConfig';
   providedIn: 'root',
 })
 export class NearService {
-  CONTRACT_NAME = 'x.paras.near';
+  CONTRACT_NAME_DEV = 'nearnut.testnet';
+  CONTRACT_NAME_PROD = 'nearnut.near';
   APP_KEY_PREFIX = 'near-nut:';
   private near: Near;
   private readAccount: Account;
@@ -29,7 +30,7 @@ export class NearService {
   constructor() {
     this.initNear().then(async ({ near, walletConnection }) => {
       if (walletConnection) {
-        this.readAccount = new Account(near.connection, this.CONTRACT_NAME);
+        this.readAccount = new Account(near.connection, this.getContractName());
         let account = this.readAccount;
         if (walletConnection.isSignedIn()) {
           // loggied in user, has write priveledge
@@ -41,11 +42,15 @@ export class NearService {
           // account with read priveledges only
           account = this.readAccount;
         }
-        this.contract = await new Contract(account, this.CONTRACT_NAME, {
+        this.contract = await new Contract(account, this.getContractName(), {
           // View methods are read only. They don't modify the state, but usually return some value.
-          viewMethods: ['nft_tokens_for_owner', 'nft_tokens_by_series'],
+          viewMethods: ['getLevel', 'getLevels'],
           // Change methods can modify the state. But you don't receive the returned value when called.
-          changeMethods: [''],
+          changeMethods: [
+            'clearLevel',
+            'nft_tokens_for_owner',
+            'nft_tokens_by_series',
+          ],
         });
         this.accountSubject.next(account);
       }
@@ -86,7 +91,7 @@ export class NearService {
     if (!this.walletConnection || !this.near) return;
     if (!this.walletConnection.isSignedIn()) {
       // Need to pass the correct contract name to be able to call change methods on behalf of the user without requesting permission
-      this.walletConnection.requestSignIn(this.CONTRACT_NAME);
+      this.walletConnection.requestSignIn(this.getContractName());
     }
   }
 
@@ -108,7 +113,8 @@ export class NearService {
     near: Near;
     walletConnection: WalletConnection | null;
   }> {
-    const nearConfig = getNearConfig('production', this.APP_KEY_PREFIX);
+    const env = environment.production ? 'production' : 'development';
+    const nearConfig = getNearConfig(env, this.APP_KEY_PREFIX);
     if (!this.near) {
       this.near = await connect(nearConfig);
       this.walletConnection = new WalletConnection(
@@ -117,5 +123,11 @@ export class NearService {
       );
     }
     return { near: this.near, walletConnection: this.walletConnection };
+  }
+
+  private getContractName() {
+    return environment.production
+      ? this.CONTRACT_NAME_PROD
+      : this.CONTRACT_NAME_DEV;
   }
 }

@@ -3,7 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Account } from 'near-api-js';
 import { first } from 'rxjs';
 import { NearService } from 'src/app/shared/near.service';
-import { NFT_SERIES_MIRROR_CRYSTALS } from 'src/app/shared/nearUtil';
+import { getMirrorCrystalSeries } from 'src/app/shared/nearUtil';
 import { ICharacter } from '../i-character';
 
 @Component({
@@ -23,7 +23,7 @@ export class CharacterSelectionComponent implements OnInit {
       description: 'Our own Near Nustronaut, chopping his way through enemies',
     },
     {
-      id: NFT_SERIES_MIRROR_CRYSTALS,
+      id: getMirrorCrystalSeries(),
       imgSrc: 'assets/mirror_crystals/MirrorCrystalsHero16x16.png',
       isOwned: false,
       name: 'Mirror Crystal Hero',
