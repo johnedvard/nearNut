@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Account } from 'near-api-js';
 import { take } from 'rxjs';
+import { GameService } from 'src/app/shared/game.service';
 import { NearService } from 'src/app/shared/near.service';
 import { getMirrorCrystalSeries } from 'src/app/shared/nearUtil';
 import { environment } from 'src/environments/environment';
@@ -45,7 +46,22 @@ export class CharacterSelectionComponent implements OnInit {
   currentCharId = this.DEFAULT_HERO_ID; // Currently selected character,
   account: Account;
 
-  constructor(private nearService: NearService, private snackBar: MatSnackBar) {
+  constructor(
+    private nearService: NearService,
+    private snackBar: MatSnackBar,
+    private gameService: GameService
+  ) {
+    this.gameService.getSelectedCharacterId().subscribe((characterId) => {
+      if (this.currentCharId !== characterId) {
+        this.currentCharId = characterId;
+      }
+      this.characters.forEach((char) => {
+        if (char.id === this.currentCharId) {
+          this.selectedCandidate = char;
+          return;
+        }
+      });
+    });
     this.nearService
       .getAccount()
       .pipe(take(1))
@@ -55,7 +71,6 @@ export class CharacterSelectionComponent implements OnInit {
       });
   }
   selectCharacter(character: ICharacter) {
-    this.selectedCandidate = character;
     if (character.isLoading) {
       this.snackBar.open('Loading data, please wait', '', { duration: 3000 });
     } else if (!character.isOwned) {
@@ -68,10 +83,14 @@ export class CharacterSelectionComponent implements OnInit {
         .subscribe(() => {
           window.open(`${this.baseParasHref}${character.id}`, 'new');
         });
+    } else {
+      this.selectedCandidate = character;
     }
   }
   confirmSelection() {
     this.currentCharId = this.selectedCandidate.id;
+    this.gameService.setSelectedCharacterId(this.currentCharId);
+
     // TODO (johnedvard) store to local storage (or contract)
   }
 

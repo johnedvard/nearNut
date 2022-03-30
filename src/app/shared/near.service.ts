@@ -26,6 +26,8 @@ export class NearService {
   private contract: Contract;
   private walletConnection: WalletConnection;
   private balance: AccountBalance;
+  private nftTokensBySeriesCache: { [series_id: string]: any } = {};
+  private nftTokensforOwnerCache: { [account_id: string]: any } = {};
 
   constructor() {
     this.initNear().then(async ({ near, walletConnection }) => {
@@ -57,19 +59,26 @@ export class NearService {
     });
   }
 
-  getNftTokensForOwner(account_id: string): Promise<string> {
+  getNftTokensForOwner(account_id: string): Promise<any> {
     const args = { account_id };
+    if (this.nftTokensforOwnerCache[account_id]) {
+      return Promise.resolve(this.nftTokensforOwnerCache[account_id]);
+    }
     return (<any>this.contract).nft_tokens_for_owner(args).then((res: any) => {
-      console.log(res);
+      console.log('nft_tokens_for_owner', res);
     });
   }
   getNftTokensBySeries(token_series_id: string): Promise<any[]> {
     if (!this.walletConnection.isSignedIn()) {
       return Promise.reject('Not signed in');
     }
+    if (this.nftTokensBySeriesCache[token_series_id]) {
+      return Promise.resolve(this.nftTokensBySeriesCache[token_series_id]);
+    }
     const args = { token_series_id };
     return (<any>this.contract).nft_tokens_by_series(args).then((res: any) => {
-      console.log(res);
+      this.nftTokensBySeriesCache[token_series_id] = res;
+      console.log('nft_tokens_by_series', res);
       return res;
     });
   }
