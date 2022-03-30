@@ -44,14 +44,13 @@ export class NearService {
         }
         this.contract = await new Contract(account, this.getContractName(), {
           // View methods are read only. They don't modify the state, but usually return some value.
-          viewMethods: [
-            'getLevel',
-            'getLevels',
+          viewMethods: ['getLevel', 'getLevels'],
+          // Change methods can modify the state. But you don't receive the returned value when called.
+          changeMethods: [
+            'clearLevel',
             'nft_tokens_for_owner',
             'nft_tokens_by_series',
           ],
-          // Change methods can modify the state. But you don't receive the returned value when called.
-          changeMethods: ['clearLevel'],
         });
         this.accountSubject.next(account);
       }
