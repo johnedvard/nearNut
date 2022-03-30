@@ -11,4 +11,5 @@ export enum GameEvent {
   goalCollision = 'goalCollision',
   doorSwitchCollision = 'doorSwitchcollision',
   levelComplete = 'levelComplete',
+  selectCharacter = 'selectCharacter',
 }

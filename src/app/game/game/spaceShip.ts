@@ -1,9 +1,11 @@
 import { init, keyPressed, load, off, on, Sprite, SpriteSheet } from 'kontra';
 import { Observable, Subject } from 'rxjs';
 import { MonetizeEvent } from 'src/app/shared/monetizeEvent';
+import { getMirrorCrystalSeries } from 'src/app/shared/nearUtil';
 
 import { GameEvent } from './gameEvent';
 import { IGameObject } from './iGameObject';
+import { IGameOptions } from './iGameOptions';
 import { PlayerAnimation } from './playerAnimation';
 import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
@@ -19,6 +21,7 @@ export class SpaceShip implements IGameObject {
   isSubscriber = false;
   spaceShipSubject = new Subject<{ sprite: Sprite }>();
   weapon: Weapon;
+  gameOptions: IGameOptions;
   constructor(
     private playerState: PlayerState,
     props: {
@@ -27,8 +30,10 @@ export class SpaceShip implements IGameObject {
       leftKey?: string;
       rightKey?: string;
       weaponKey?: string;
+      gameOptions?: IGameOptions;
     }
   ) {
+    this.gameOptions = props.gameOptions || {};
     this.rightKey = props.rightKey || this.rightKey;
     this.leftKey = props.leftKey || this.leftKey;
     this.weapon = new SwordWeapon();
@@ -36,8 +41,13 @@ export class SpaceShip implements IGameObject {
     this.initSpaceShip(props.spriteProps);
     on(GameEvent.playerStateChange, this.onPlayerStateChange);
     on(MonetizeEvent.progress, this.onMonetizeProgress);
+    on(GameEvent.selectCharacter, this.onSelectCharacter);
   }
 
+  onSelectCharacter = ({ id }) => {
+    this.gameOptions.characterId = id;
+    this.initSpaceShip({ x: this.sprite.x, y: this.sprite.y, color: '' });
+  };
   cleanup(): void {
     off(GameEvent.playerStateChange, this.onPlayerStateChange);
     off(MonetizeEvent.progress, this.onMonetizeProgress);
@@ -60,12 +70,25 @@ export class SpaceShip implements IGameObject {
     }
   }
 
+  getSelectedSpriteSheet() {
+    const mirrorCrystalIds = [getMirrorCrystalSeries()];
+    console.log('mirrorCrystalIds', mirrorCrystalIds);
+    const defaultSpriteSheet =
+      'assets/platform_metroidvania/herochar sprites(new)/herochar_spritesheet(new).png';
+    const mirrorCrystalSpriteSheet =
+      'assets/mirror_crystals/mirrorcrystal_spritesheet(new).png';
+    let spriteSheet = defaultSpriteSheet;
+    if (this.gameOptions) {
+      if (mirrorCrystalIds.includes(this.gameOptions.characterId)) {
+        spriteSheet = mirrorCrystalSpriteSheet;
+      }
+    }
+    return spriteSheet;
+  }
   initSpaceShip({ x, y, color }) {
     const spaceShip = this;
     const rotationSpeed = 5;
-    load(
-      'assets/platform_metroidvania/herochar sprites(new)/herochar_spritesheet(new).png'
-    ).then((assets) => {
+    load(this.getSelectedSpriteSheet()).then((assets) => {
       const spriteSheet = SpriteSheet({
         image: assets[0],
         frameWidth: 16,

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { emit } from 'kontra';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { GameEvent } from '../game/game/gameEvent';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +20,7 @@ export class GameService {
   setSelectedCharacterId(id: string) {
     localStorage.setItem('selectedCharacterId', id);
     this.selectedCharacterSubject.next(id);
+    emit(GameEvent.selectCharacter, { id });
   }
 
   getSelectedCharacterId(): Observable<string> {

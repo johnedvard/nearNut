@@ -3,14 +3,18 @@ import {
   init,
   initKeys,
   initPointer,
+  off,
+  on,
   TileEngine,
   track,
 } from 'kontra';
 import { EditorControls } from './editorControls';
+import { GameEvent } from './gameEvent';
 import { createGameObject } from './gameObjectFactory';
 import { gameHeight, gameWidth } from './gameSettings';
 import { loadLevelFromObject } from './gameUtils';
 import { IGameObject } from './iGameObject';
+import { IGameOptions } from './iGameOptions';
 import { ILevelData } from './iLevelData';
 
 export class LevelEditor {
@@ -20,7 +24,7 @@ export class LevelEditor {
   ctx: CanvasRenderingContext2D;
   tileEngine: TileEngine;
   editorControls: EditorControls;
-  constructor(private level: ILevelData) {
+  constructor(private level: ILevelData, private gameOptions?: IGameOptions) {
     const id = 'game';
     const { canvas } = init(id);
     canvas.oncontextmenu = function (e) {
@@ -86,9 +90,13 @@ export class LevelEditor {
       }
     );
 
+    console.log('this.gameOptions', this.gameOptions);
     for (const key in gameObjects) {
       if (gameObjects.hasOwnProperty(key)) {
-        const gameObj = createGameObject(key, { ...gameObjects[key] });
+        const gameObj = createGameObject(key, {
+          ...gameObjects[key],
+          gameOptions: this.gameOptions,
+        });
         this.gos.push(gameObj);
         this.editorControls.addGameObject(gameObj);
         tileEngine.add(gameObj);

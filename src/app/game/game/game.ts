@@ -31,12 +31,14 @@ import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 import { gameHeight, gameWidth } from './gameSettings';
 import { Goal } from './goal';
 import { createGameObject } from './gameObjectFactory';
+import { IGameOptions } from './iGameOptions';
 
 export class Game {
   private state: GameState = GameState.loading;
   scale = 2;
   canvas: HTMLCanvasElement;
   gameObjects: GameObjects;
+  gameOptions: IGameOptions;
   gos: IGameObject[] = [];
   loop: GameLoop;
   tileEngine: TileEngine;
@@ -45,13 +47,13 @@ export class Game {
   maxSx = 0;
   maxSy = 0;
   constructor();
-  constructor(level: ILevelData);
+  constructor(level: ILevelData, gameOptions?: IGameOptions);
   /**
    * The game only cares about one level at a time.
    * Load level, create game objects
    * @param id canvas ID
    */
-  constructor(idOrLevel?: string | ILevelData) {
+  constructor(idOrLevel?: string | ILevelData, gameOptions?: IGameOptions) {
     const id = 'game';
     const { canvas } = init(id);
     this.canvas = canvas;
@@ -61,13 +63,13 @@ export class Game {
     if (idOrLevel && (<ILevelData>idOrLevel).tilewidth) {
       loadLevelFromObject(<ILevelData>idOrLevel).then(
         ({ tileEngine, gameObjects }) => {
-          this.initGameLoop({ tileEngine, gameObjects });
+          this.initGameLoop({ tileEngine, gameObjects, gameOptions });
         }
       );
     } else {
       loadLevelFromFile(<string>idOrLevel).then(
         ({ tileEngine, gameObjects }) => {
-          this.initGameLoop({ tileEngine, gameObjects });
+          this.initGameLoop({ tileEngine, gameObjects, gameOptions });
         }
       );
     }
@@ -81,9 +83,10 @@ export class Game {
     this.gos.forEach((go) => go.cleanup());
   }
 
-  initGameLoop({ tileEngine, gameObjects }) {
+  initGameLoop({ tileEngine, gameObjects, gameOptions }) {
     const scale = this.scale;
     this.gameObjects = gameObjects;
+    this.gameOptions = gameOptions || {};
     this.setState(GameState.ready);
     this.initKeyBindings();
     this.tileEngine = tileEngine;
@@ -104,7 +107,7 @@ export class Game {
     this.maxSy = maxSy;
     this.ctx.scale(this.scale, this.scale);
 
-    this.initGame(gameObjects);
+    this.initGame({ gameObjects, gameOptions });
     this.loop = GameLoop({
       update: (dt: number) => {
         this.gos.forEach((go: any) => {
@@ -131,14 +134,17 @@ export class Game {
     });
     this.loop.start();
   }
-  initGame(gameObjects: GameObjects) {
+  initGame({ gameObjects, gameOptions }) {
     if (this.tileEngine) {
       this.gos.forEach((go) => {
         this.tileEngine.remove(go);
       });
       for (const key in gameObjects) {
         if (gameObjects.hasOwnProperty(key)) {
-          const gameObj = createGameObject(key, { ...gameObjects[key] });
+          const gameObj = createGameObject(key, {
+            ...gameObjects[key],
+            gameOptions,
+          });
           if (gameObj instanceof Player) {
             this.player = gameObj;
           }
@@ -227,7 +233,10 @@ export class Game {
 
   resetGame() {
     this.cleanup();
-    this.initGame(this.gameObjects);
+    this.initGame({
+      gameObjects: this.gameObjects,
+      gameOptions: this.gameOptions,
+    });
     this.setState(GameState.ready);
   }
 

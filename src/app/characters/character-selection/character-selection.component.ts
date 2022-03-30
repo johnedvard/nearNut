@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Account } from 'near-api-js';
-import { take } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { GameService } from 'src/app/shared/game.service';
 import { NearService } from 'src/app/shared/near.service';
 import { getMirrorCrystalSeries } from 'src/app/shared/nearUtil';
@@ -13,7 +13,7 @@ import { ICharacter } from '../i-character';
   templateUrl: './character-selection.component.html',
   styleUrls: ['./character-selection.component.sass'],
 })
-export class CharacterSelectionComponent implements OnInit {
+export class CharacterSelectionComponent implements OnInit, OnDestroy {
   baseParasHref = environment.mainnet
     ? 'https://paras.id/token/x.paras.near::'
     : 'https://testnet.paras.id/token/paras-token-v2.testnet::';
@@ -45,23 +45,26 @@ export class CharacterSelectionComponent implements OnInit {
   selectedCandidate = this.characters[0]; // Candidate
   currentCharId = this.DEFAULT_HERO_ID; // Currently selected character,
   account: Account;
+  characterSub: Subscription;
 
   constructor(
     private nearService: NearService,
     private snackBar: MatSnackBar,
     private gameService: GameService
   ) {
-    this.gameService.getSelectedCharacterId().subscribe((characterId) => {
-      if (this.currentCharId !== characterId) {
-        this.currentCharId = characterId;
-      }
-      this.characters.forEach((char) => {
-        if (char.id === this.currentCharId) {
-          this.selectedCandidate = char;
-          return;
+    this.characterSub = this.gameService
+      .getSelectedCharacterId()
+      .subscribe((characterId) => {
+        if (this.currentCharId !== characterId) {
+          this.currentCharId = characterId;
         }
+        this.characters.forEach((char) => {
+          if (char.id === this.currentCharId) {
+            this.selectedCandidate = char;
+            return;
+          }
+        });
       });
-    });
     this.nearService
       .getAccount()
       .pipe(take(1))
@@ -121,4 +124,9 @@ export class CharacterSelectionComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+  ngOnDestroy() {
+    if (this.characterSub) {
+      this.characterSub.unsubscribe();
+    }
+  }
 }

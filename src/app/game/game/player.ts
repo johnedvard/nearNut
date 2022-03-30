@@ -1,14 +1,13 @@
 import { MonetizeEvent } from 'src/app/shared/monetizeEvent';
 
-import { Game } from './game';
-import { getPlayerControls, isOutOfBounds } from './gameUtils';
+import { getPlayerControls } from './gameUtils';
 import { EngineParticleEffect } from './engineParticleEffect';
-import { emit, keyPressed, off, on, Sprite, Vector } from 'kontra';
+import { emit, keyPressed, off, on, Sprite } from 'kontra';
 import { IGameObject } from './iGameObject';
 import { PlayerState } from './playerState';
 import { GameEvent } from './gameEvent';
 import { SpaceShip } from './spaceShip';
-import { PlayerAnimation } from './playerAnimation';
+import { IGameOptions } from './iGameOptions';
 
 class Player implements IGameObject {
   sprite: Sprite;
@@ -26,6 +25,7 @@ class Player implements IGameObject {
       color: string;
       x: number;
       y: number;
+      gameOptions?: IGameOptions;
     }
   ) {
     const spriteProps = {
@@ -39,6 +39,7 @@ class Player implements IGameObject {
       isPreview: false,
       rightKey,
       leftKey,
+      gameOptions: this.playerProps.gameOptions,
     });
     this.effect = new EngineParticleEffect();
 
