@@ -22,13 +22,7 @@ export class LoginMenuComponent implements OnInit {
         this.isSignedIn = false;
       } else {
         this.isSignedIn = true;
-        this.nearService
-          .getNftTokensForOwner(account.accountId)
-          .catch((err) => {
-            this.snackbar.open('Login to select character', '', {
-              duration: 2500,
-            });
-          });
+        this.nearService.getNftTokensForOwner(account.accountId);
       }
     });
   }

@@ -59,9 +59,6 @@ export class NearService {
   }
 
   getNftTokensForOwner(account_id: string): Promise<string> {
-    if (!this.walletConnection.isSignedIn()) {
-      return Promise.reject('Not signed in');
-    }
     const args = { account_id };
     return (<any>this.contract).nft_tokens_for_owner(args).then((res: any) => {
       console.log(res);
