@@ -28,6 +28,7 @@ export class CharacterSelectionComponent implements OnInit {
       isOwned: true,
       name: 'Near Nut',
       description: 'Our own Near Nustronaut, chopping his way through enemies',
+      isLoading: false,
     },
     {
       id: getMirrorCrystalSeries(),
@@ -36,6 +37,7 @@ export class CharacterSelectionComponent implements OnInit {
       name: 'Mirror Crystal Hero',
       description:
         'With the ability to portal himself, pass through enemies in a blink',
+      isLoading: true,
     },
   ];
   // TODO (johnedvard) read from localstorage (or contract) to get last selected ID.
@@ -54,6 +56,9 @@ export class CharacterSelectionComponent implements OnInit {
   }
   selectCharacter(character: ICharacter) {
     this.selectedCandidate = character;
+    if (character.isLoading) {
+      this.snackBar.open('Loading data, please wait', '', { duration: 3000 });
+    }
     if (!character.isOwned) {
       const toast = this.snackBar.open('Not owned', this.buyFromParasStr, {
         duration: 3000,
@@ -75,6 +80,7 @@ export class CharacterSelectionComponent implements OnInit {
     this.characters.forEach((c) => {
       if (c.id === this.DEFAULT_HERO_ID) return;
       // TODO (johnedvard) add pagination system
+      c.isLoading = true;
       this.nearService
         .getNftTokensBySeries(c.id)
         .then((res) => {
@@ -89,6 +95,9 @@ export class CharacterSelectionComponent implements OnInit {
           this.snackBar.open('Login to select character', '', {
             duration: 2500,
           });
+        })
+        .finally(() => {
+          c.isLoading = false;
         });
     });
   }

@@ -23,10 +23,14 @@
       [ngClass]="{
         owned: character.isOwned,
         selected: selectedCandidate.id === character.id,
-        current: currentCharId === character.id
+        current: currentCharId === character.id,
+        loading: character.isLoading
       }"
     >
       <img [src]="character.imgSrc" />
+      <div id="characterLoading" *ngIf="character.isLoading">
+        <div class="loader"></div>
+      </div>
     </div>
   </div>
 </mat-dialog-content>

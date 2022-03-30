@@ -4,4 +4,5 @@ export interface ICharacter {
   name: string;
   isOwned: boolean;
   description: string;
+  isLoading: boolean;
 }
