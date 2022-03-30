@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Account } from 'near-api-js';
-import { first } from 'rxjs';
+import { take } from 'rxjs';
 import { NearService } from 'src/app/shared/near.service';
 import { getMirrorCrystalSeries } from 'src/app/shared/nearUtil';
 import { environment } from 'src/environments/environment';
@@ -46,7 +46,7 @@ export class CharacterSelectionComponent implements OnInit {
   constructor(private nearService: NearService, private snackBar: MatSnackBar) {
     this.nearService
       .getAccount()
-      .pipe(first())
+      .pipe(take(1))
       .subscribe((a) => {
         this.account = a;
         this.getNftCharacters();
@@ -55,17 +55,14 @@ export class CharacterSelectionComponent implements OnInit {
   selectCharacter(character: ICharacter) {
     this.selectedCandidate = character;
     if (!character.isOwned) {
-      const toast = this.snackBar.open('Not owned', 'Buy NFT from Paras', {
+      const toast = this.snackBar.open('Not owned', this.buyFromParasStr, {
         duration: 3000,
       });
       toast
         .onAction()
-        .pipe(first())
+        .pipe(take(1))
         .subscribe(() => {
-          window.open(
-            `https://paras.id/token/x.paras.near::${character.id}`,
-            'new'
-          );
+          window.open(`${this.baseParasHref}${character.id}`, 'new');
         });
     }
   }
@@ -78,14 +75,21 @@ export class CharacterSelectionComponent implements OnInit {
     this.characters.forEach((c) => {
       if (c.id === this.DEFAULT_HERO_ID) return;
       // TODO (johnedvard) add pagination system
-      this.nearService.getNftTokensBySeries(c.id).then((res) => {
-        // Check if current user owns any tokens in the series
-        res.find((r) => {
-          if (r.owner_id === this.account.accountId) {
-            c.isOwned = true;
-          }
+      this.nearService
+        .getNftTokensBySeries(c.id)
+        .then((res) => {
+          // Check if current user owns any tokens in the series
+          res.find((r) => {
+            if (r.owner_id === this.account.accountId) {
+              c.isOwned = true;
+            }
+          });
+        })
+        .catch((err) => {
+          this.snackBar.open('Login to select character', '', {
+            duration: 2500,
+          });
         });
-      });
     });
   }
 

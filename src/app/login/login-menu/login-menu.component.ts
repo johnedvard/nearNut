@@ -1,4 +1,5 @@
 import { Component, HostBinding, HostListener, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Account } from 'near-api-js';
 import { NearService } from 'src/app/shared/near.service';
 
@@ -13,7 +14,7 @@ export class LoginMenuComponent implements OnInit {
 
   @HostBinding('class.signed-in') isSignedIn: boolean = false;
 
-  constructor(private nearService: NearService) {
+  constructor(private nearService: NearService, private snackbar: MatSnackBar) {
     this.nearService.getAccount().subscribe((account) => {
       this.account = account;
       this.isReady = true;
@@ -21,7 +22,13 @@ export class LoginMenuComponent implements OnInit {
         this.isSignedIn = false;
       } else {
         this.isSignedIn = true;
-        this.nearService.getNftTokensForOwner(account.accountId);
+        this.nearService
+          .getNftTokensForOwner(account.accountId)
+          .catch((err) => {
+            this.snackbar.open('Login to select character', '', {
+              duration: 2500,
+            });
+          });
       }
     });
   }
