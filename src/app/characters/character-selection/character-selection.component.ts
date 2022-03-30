@@ -58,8 +58,7 @@ export class CharacterSelectionComponent implements OnInit {
     this.selectedCandidate = character;
     if (character.isLoading) {
       this.snackBar.open('Loading data, please wait', '', { duration: 3000 });
-    }
-    if (!character.isOwned) {
+    } else if (!character.isOwned) {
       const toast = this.snackBar.open('Not owned', this.buyFromParasStr, {
         duration: 3000,
       });
