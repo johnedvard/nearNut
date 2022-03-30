@@ -72,7 +72,6 @@ export class SpaceShip implements IGameObject {
 
   getSelectedSpriteSheet() {
     const mirrorCrystalIds = [getMirrorCrystalSeries()];
-    console.log('mirrorCrystalIds', mirrorCrystalIds);
     const defaultSpriteSheet =
       'assets/platform_metroidvania/herochar sprites(new)/herochar_spritesheet(new).png';
     const mirrorCrystalSpriteSheet =

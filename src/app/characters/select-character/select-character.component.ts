@@ -18,8 +18,6 @@ export class SelectCharacterComponent implements OnInit {
       width: '80vw',
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      console.log(`Dialog result: ${result}`);
-    });
+    dialogRef.afterClosed().subscribe((result) => {});
   }
 }
