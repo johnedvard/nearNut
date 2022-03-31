@@ -1,24 +1,40 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { load, emit } from 'kontra';
-import { EditorEvent } from 'src/app/game/game/editorEvent';
 import { tileMapNameDefault } from 'src/app/game/game/gameSettings';
+import { LevelEditorService } from '../level-editor.service';
+import { EditorState } from '../level-editor/level-editor.component';
 
 @Component({
   selector: 'app-level-toolbar',
   templateUrl: './level-toolbar.component.html',
   styleUrls: ['./level-toolbar.component.sass'],
 })
-export class LevelToolbarComponent implements OnInit {
+export class LevelToolbarComponent implements OnInit, OnChanges {
   isTilesPanelOpen = false;
   tileSources = [];
   selectedTileSrc;
+  @Input() editorState: EditorState;
   @Output() backClick = new EventEmitter();
   tiles: any[] = [
     { value: 'steak-0', viewValue: 'Steak' },
     { value: 'pizza-1', viewValue: 'Pizza' },
     { value: 'tacos-2', viewValue: 'Tacos' },
   ];
-  constructor() {}
+  constructor(private editorService: LevelEditorService) {}
+  ngOnChanges(changes: SimpleChanges): void {
+    const editorState = (<any>changes).editorState;
+    if (editorState && <EditorState>editorState.currentValue === 'playing') {
+      this.closeToolbar();
+    }
+  }
 
   backButtonClick(evt) {
     this.backClick.emit(evt);
@@ -51,21 +67,25 @@ export class LevelToolbarComponent implements OnInit {
           this.tileSources.push(target.src);
         }
       }
-      this.selectedTileSrc = this.tileSources[7]; // default delete tile
+      this.selectedTileSrc =
+        this.tileSources[this.editorService.tileSubject.getValue()];
     });
   }
   openPaintTool() {
     this.isTilesPanelOpen = !this.isTilesPanelOpen;
   }
+  closeToolbar() {
+    this.isTilesPanelOpen = false;
+  }
   handleTilesPanelClick(evt) {
+    console.log('handle tile panel click');
     if (evt && evt.target) {
       if (evt.target.id.match('tileIndex-')) {
         this.selectedTileSrc = evt.target.src;
-        emit(EditorEvent.selectTile, { tile: this.getTileId(evt.target.id) });
+        this.editorService.tileSubject.next(this.getTileId(evt.target.id));
       }
     }
   }
-
   /**
    * Tilemap is actually 12 tiles long
    */

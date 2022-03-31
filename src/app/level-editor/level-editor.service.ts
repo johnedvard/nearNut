@@ -7,9 +7,14 @@ import { ILevelData } from '../game/game/iLevelData';
 })
 export class LevelEditorService {
   levels: BehaviorSubject<ILevelData[]> = new BehaviorSubject<ILevelData[]>([]);
+  tileSubject: BehaviorSubject<number> = new BehaviorSubject<number>(7); // defaults to delete tile
   KEY_PREFIX = 'NearNut-';
   constructor() {
     this.levels.next(this.getLevelsFromLocalStorage());
+  }
+
+  getTileId(): Observable<number> {
+    return this.tileSubject.asObservable();
   }
 
   createNewLevel() {

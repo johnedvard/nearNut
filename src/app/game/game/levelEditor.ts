@@ -13,6 +13,7 @@ import { GameEvent } from './gameEvent';
 import { createGameObject } from './gameObjectFactory';
 import { gameHeight, gameWidth } from './gameSettings';
 import { loadLevelFromObject } from './gameUtils';
+import { IAngularServices } from './iAngularServices';
 import { IGameObject } from './iGameObject';
 import { IGameOptions } from './iGameOptions';
 import { ILevelData } from './iLevelData';
@@ -24,7 +25,11 @@ export class LevelEditor {
   ctx: CanvasRenderingContext2D;
   tileEngine: TileEngine;
   editorControls: EditorControls;
-  constructor(private level: ILevelData, private gameOptions?: IGameOptions) {
+  constructor(
+    private level: ILevelData,
+    private gameOptions?: IGameOptions,
+    private angularServices?: IAngularServices
+  ) {
     const id = 'game';
     const { canvas } = init(id);
     canvas.oncontextmenu = function (e) {
@@ -87,7 +92,8 @@ export class LevelEditor {
       this.level,
       {
         scale: this.scale,
-      }
+      },
+      this.angularServices
     );
 
     console.log('this.gameOptions', this.gameOptions);

@@ -1,6 +1,11 @@
 <div>
   <button mat-button (click)="backButtonClick($event)">Back</button>
-  <button mat-button id="paintTool" (click)="openPaintTool()">
+  <button
+    [disabled]="editorState !== 'editing'"
+    mat-button
+    id="paintTool"
+    (click)="openPaintTool()"
+  >
     Select Tile <img [src]="selectedTileSrc" />
   </button>
   <app-login-menu></app-login-menu>

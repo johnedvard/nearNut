@@ -7,6 +7,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { LevelEditorService } from 'src/app/level-editor/level-editor.service';
 import { GameService } from 'src/app/shared/game.service';
 import { Game } from './game';
 import { ILevelData } from './iLevelData';
@@ -25,7 +26,10 @@ export class GameComponent implements OnInit, OnDestroy, OnChanges {
   levelEditor: LevelEditor;
   characterSub: Subscription;
   selectedCharacterId: string = '';
-  constructor(private gameService: GameService) {
+  constructor(
+    private gameService: GameService,
+    private editorService: LevelEditorService
+  ) {
     this.characterSub = this.gameService
       .getSelectedCharacterId()
       .subscribe((id) => {
@@ -55,9 +59,13 @@ export class GameComponent implements OnInit, OnDestroy, OnChanges {
   }
   initGameEditor() {
     if (this.isEditing) {
-      this.levelEditor = new LevelEditor(this.level, {
-        characterId: this.selectedCharacterId,
-      });
+      this.levelEditor = new LevelEditor(
+        this.level,
+        {
+          characterId: this.selectedCharacterId,
+        },
+        { editorService: this.editorService }
+      );
     } else {
       if (this.level) {
         this.game = new Game(this.level, {

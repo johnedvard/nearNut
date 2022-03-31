@@ -27,7 +27,8 @@
 </div>
 
 <div *ngIf="selectedLevel">
-  <app-level-toolbar (backClick)="goBackToSelection()"> </app-level-toolbar>
+  <app-level-toolbar (backClick)="goBackToSelection()" [editorState]="state">
+  </app-level-toolbar>
   <div *ngIf="state === 'editing'">
     <div>"alt + mouse drag" inside grid to pan map</div>
     <div>"mouse drag" to move objects</div>

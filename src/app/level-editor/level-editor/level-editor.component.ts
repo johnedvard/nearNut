@@ -4,14 +4,14 @@ import { Subscription } from 'rxjs';
 import { ILevelData } from 'src/app/game/game/iLevelData';
 import { LevelEditorService } from '../level-editor.service';
 
-type State = 'playing' | 'editing' | 'selecting';
+export type EditorState = 'playing' | 'editing' | 'selecting';
 @Component({
   selector: 'app-level-editor',
   templateUrl: './level-editor.component.html',
   styleUrls: ['./level-editor.component.sass'],
 })
 export class LevelEditorComponent implements OnInit, OnDestroy {
-  state: State = 'playing';
+  state: EditorState = 'playing';
   levelsSub: Subscription;
   levels: ILevelData[];
   selectedLevel: ILevelData = null;
@@ -47,7 +47,7 @@ export class LevelEditorComponent implements OnInit, OnDestroy {
     this.selectedLevel = null;
     this.setState('selecting');
   }
-  setState(state: State): void {
+  setState(state: EditorState): void {
     this.state = state;
   }
 

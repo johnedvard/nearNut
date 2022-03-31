@@ -2,17 +2,14 @@ import {
   GameObject,
   getPointer,
   offPointer,
-  on,
   onPointer,
   TileEngine,
-  track,
-  untrack,
 } from 'kontra';
-import { EditorEvent } from './editorEvent';
 import { EditorTile } from './editorTile';
 import { getGameOjectKey } from './gameObjectFactory';
 import { GameObjectType } from './gameObjects';
 import { getCol, getMaxSxSy, getRow } from './gameUtils';
+import { IAngularServices } from './iAngularServices';
 import { IGameObject } from './iGameObject';
 import { ILevelData } from './iLevelData';
 
@@ -46,7 +43,8 @@ export class EditorControls {
     private canvas: HTMLCanvasElement,
     private tileEngine: TileEngine,
     private level: ILevelData,
-    { scale }
+    { scale },
+    private angularServices?: IAngularServices
   ) {
     this.scale = scale;
     onPointer('down', this.onPointerDown);
@@ -55,7 +53,9 @@ export class EditorControls {
       mapwidth: this.tileEngine.mapwidth,
       mapheight: this.tileEngine.mapheight,
     });
-    on(EditorEvent.selectTile, this.onSelectTile);
+    this.angularServices.editorService
+      .getTileId()
+      .subscribe((tile) => this.onSelectTile({ tile }));
   }
 
   onSelectTile = ({ tile }) => {
@@ -205,7 +205,6 @@ export class EditorControls {
 
   /** takes sx, sy and scale into account when checking for object */
   checkPointerDownObjects(e): boolean {
-    console.log(e.offsetX + this.tileEngine.sx * this.scale);
     this.gos.forEach((go) => {
       if (
         e.offsetX + this.tileEngine.sx * this.scale <
