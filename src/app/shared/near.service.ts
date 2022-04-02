@@ -99,6 +99,7 @@ export class NearService {
   }
 
   login() {
+    console.log('click login');
     // TODO (johnedvard) get env variable instead of hardcode development
     if (!this.walletConnection || !this.near) return;
     if (!this.walletConnection.isSignedIn()) {

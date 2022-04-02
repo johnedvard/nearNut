@@ -3,6 +3,14 @@
   <button
     [disabled]="editorState !== 'editing'"
     mat-button
+    id="customizePanelBtn"
+    (click)="openCustomizePanel()"
+  >
+    &#8964;
+  </button>
+  <button
+    [disabled]="editorState !== 'editing'"
+    mat-button
     id="paintTool"
     (click)="openPaintTool()"
   >

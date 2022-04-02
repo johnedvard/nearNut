@@ -77,6 +77,9 @@ export class LevelToolbarComponent implements OnInit, OnChanges {
   closeToolbar() {
     this.isTilesPanelOpen = false;
   }
+  openCustomizePanel() {
+    console.log('open dialog');
+  }
   handleTilesPanelClick(evt) {
     console.log('handle tile panel click');
     if (evt && evt.target) {
