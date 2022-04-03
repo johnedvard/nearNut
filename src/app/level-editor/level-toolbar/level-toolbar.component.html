@@ -1,5 +1,15 @@
-<div>
+<div id="toolbar">
   <button mat-button (click)="backButtonClick($event)">Back</button>
+  <div id="toolButtons">
+    <button
+      mat-button
+      *ngFor="let btn of toolPanelBtns"
+      (click)="handleToolClick(btn)"
+    >
+      {{ btn.imgSrc }}
+    </button>
+  </div>
+
   <button
     [disabled]="editorState !== 'editing'"
     mat-button
@@ -14,7 +24,7 @@
     id="paintTool"
     (click)="openPaintTool()"
   >
-    Select Tile <img [src]="selectedTileSrc" />
+    <img [src]="selectedTileSrc" />
   </button>
   <app-login-menu></app-login-menu>
 </div>
@@ -26,8 +36,8 @@
 >
   <img
     class="tile"
-    [id]="'tileIndex-' + (i + 1)"
-    [src]="src"
-    *ngFor="let src of tileSources; index as i"
+    [id]="'tileIndex-' + tileSource.tile"
+    [src]="tileSource.src"
+    *ngFor="let tileSource of tileSources; index as i"
   />
 </mat-card>

@@ -59,6 +59,7 @@ export class EditorControls {
   }
 
   onSelectTile = ({ tile }) => {
+    console.log('tile id', tile);
     this.setSelectedTile(tile);
   };
   setSelectedTile(tile: number) {

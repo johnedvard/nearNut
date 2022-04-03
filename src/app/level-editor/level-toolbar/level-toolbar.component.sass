@@ -1,11 +1,16 @@
 @use 'src/common'
 
-div
+#toolbar
   width: 100%
   height: 48px
   display: flex
   border-bottom: 1px solid rgba(255,255,255,.12)
-  
+
+#toolButtons
+  flex: 1 1 auto
+  display: flex
+  justify-content: center
+  justify-items: center
 
 #customizePanelBtn
   margin-right: 14px
@@ -13,7 +18,11 @@ div
 
 #paintTool
   margin-right: 14px
-  
+  img
+    padding: 4px
+    outline: 2px solid white
+    border-radius: 2px
+
 #tilesPanel
   position: absolute
   display: grid

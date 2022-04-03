@@ -7,7 +7,10 @@ import { ILevelData } from '../game/game/iLevelData';
 })
 export class LevelEditorService {
   levels: BehaviorSubject<ILevelData[]> = new BehaviorSubject<ILevelData[]>([]);
-  tileSubject: BehaviorSubject<number> = new BehaviorSubject<number>(7); // defaults to delete tile
+  tileSubject: BehaviorSubject<number> = new BehaviorSubject<number>(17); // defaults to delete tile
+  selectedToolSubject: BehaviorSubject<any> = new BehaviorSubject<any>(
+    'someTool'
+  ); // defaults to delete tile
   KEY_PREFIX = 'NearNut-';
   constructor() {
     this.levels.next(this.getLevelsFromLocalStorage());
@@ -89,6 +92,12 @@ export class LevelEditorService {
   }
   saveLevel(level: ILevelData) {
     this.setLocalItem(level.name, level);
+  }
+  setSelectedTool(tool: any) {
+    this.selectedToolSubject.next(tool);
+  }
+  getSelectedTool(): Observable<any> {
+    return this.selectedToolSubject.asObservable();
   }
   initEmptyLevel(levelIndex: number): ILevelData {
     const level: ILevelData = {
