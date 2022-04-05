@@ -8,8 +8,10 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  QueryList,
   SimpleChanges,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { load, emit, GameLoop } from 'kontra';
 import { Subscription } from 'rxjs';
@@ -31,15 +33,14 @@ export class LevelToolbarComponent
   isTilesPanelOpen = false;
   tileSources: { src: string; tile: number }[] = [];
   selectedTileSrc: string;
-  selectedTool: any;
-  ctx: any;
+  selectedTool: Tool;
   toolPanelBtns: ToolBtn[] = [
-    { imgSrc: 'tool', tool: new Tool(null) },
-    { imgSrc: 'tool2', tool: new Tool(null, 'door') },
+    { imgSrc: 'tool', tool: new Tool('goblinBomber') },
+    { imgSrc: 'tool2', tool: new Tool('doorSwitch') },
   ];
   selectedToolSub: Subscription;
 
-  @ViewChild('toolCanvas') toolCanvas: ElementRef;
+  @ViewChildren('toolCanvas') toolCanvas: QueryList<ElementRef>;
   @Input() editorState: EditorState;
   @Output() backClick = new EventEmitter();
   constructor(private editorService: LevelEditorService) {
@@ -108,25 +109,27 @@ export class LevelToolbarComponent
       this.selectedTileSrc = tileSource.src;
     });
   }
+  /**
+   * Creates a game loop for each tool (canvas) with it's own context
+   */
+  createGameLoops() {
+    this.toolCanvas.forEach((res, index) => {
+      const ctx = res.nativeElement.getContext('2d');
+      this.toolPanelBtns[index].tool.setContext(ctx);
+      const loop = GameLoop({
+        context: ctx,
+        update: (dt) => {
+          this.toolPanelBtns[index].tool.update(dt);
+        },
+        render: () => {
+          this.toolPanelBtns[index].tool.render();
+        },
+      });
+      loop.start();
+    });
+  }
   ngAfterViewInit() {
-    this.ctx = (<any>document.getElementById('toolCanvas')).getContext('2d');
-    this.toolPanelBtns.forEach((btn) => {
-      btn.tool.setContext(this.ctx);
-    });
-    const loop = GameLoop({
-      context: this.ctx, // XXX (johnedvard) this isn't doing anything
-      update: (dt) => {
-        this.toolPanelBtns.forEach((btn) => {
-          btn.tool.update(dt);
-        });
-      },
-      render: () => {
-        this.toolPanelBtns.forEach((btn) => {
-          btn.tool.render();
-        });
-      },
-    });
-    loop.start();
+    this.createGameLoops();
   }
   openPaintTool() {
     this.isTilesPanelOpen = !this.isTilesPanelOpen;

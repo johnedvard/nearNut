@@ -4,12 +4,16 @@ import { DoorSwitch } from './doorSwitch';
 import { IGameObject } from './iGameObject';
 import { Player } from './player';
 import { Goal } from './goal';
+import { GoblinBomber } from './goblinBomber';
 
 /**
  * Remember to support old keys when modifying the types,
  * otherwise, old data will break
  */
-export const createGameObject = (key: string, data: any): IGameObject => {
+export const createGameObject = (
+  key: GameObjectType | string,
+  data: any
+): IGameObject => {
   if (!isOfTypeGameObject(key)) throw new Error('Not a valid type');
   const type = <GameObjectType>key;
   switch (type) {
@@ -21,6 +25,8 @@ export const createGameObject = (key: string, data: any): IGameObject => {
       return new DoorSwitch({ ...data });
     case 'goal':
       return new Goal({ ...data });
+    case 'goblinBomber':
+      return new GoblinBomber({ ...data });
     default:
       throw new Error('Not a valid game object type');
   }

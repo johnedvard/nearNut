@@ -6,8 +6,8 @@ import { Player } from './player';
 export class Goal implements IGameObject {
   sprite: Sprite;
 
-  constructor({ x, y }) {
-    this.initGoal({ x, y });
+  constructor(options) {
+    this.initGoal(options);
     on(GameEvent.goalCollision, this.onGoalCollision);
   }
 
@@ -21,13 +21,13 @@ export class Goal implements IGameObject {
     }
   };
 
-  initGoal({ x, y }) {
+  initGoal({ x, y, anchor }) {
     load('assets/platform_metroidvania/miscellaneous sprites/door.png').then(
       (assets) => {
         this.sprite = Sprite({
           x: x,
           y: y,
-          anchor: { x: 0.5, y: 0.5 },
+          anchor: anchor || { x: 0.5, y: 0.5 },
           image: assets[0],
           frameWidth: 24,
           frameHeight: 24,

@@ -12,8 +12,8 @@ export class DoorSwitch implements IGameObject {
   sprite: Sprite;
   readySubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  constructor({ x, y }) {
-    this.initDoorSwitch({ x, y });
+  constructor(options) {
+    this.initDoorSwitch(options);
     on(GameEvent.doorSwitchCollision, this.onDoorSwitchCollision);
   }
 
@@ -44,7 +44,7 @@ export class DoorSwitch implements IGameObject {
     }
   }
 
-  initDoorSwitch({ x, y }) {
+  initDoorSwitch({ x, y, anchor }) {
     load(
       'assets/platform_metroidvania/miscellaneous sprites/orb_anim_strip_6.png',
       'assets/platform_metroidvania/miscellaneous sprites/orb_collected_anim_strip_5.png'
@@ -77,7 +77,7 @@ export class DoorSwitch implements IGameObject {
       this.sprite = Sprite({
         x: x,
         y: y,
-        anchor: { x: 0.5, y: 0.5 },
+        anchor: anchor || { x: 0.5, y: 0.5 },
         animations: {
           ...idleSpriteSheet.animations,
           ...collectedSpriteSheet.animations,

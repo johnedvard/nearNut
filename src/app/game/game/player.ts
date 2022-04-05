@@ -25,12 +25,14 @@ class Player implements IGameObject {
       color: string;
       x: number;
       y: number;
+      anchor?: { x: number; y: number };
       gameOptions?: IGameOptions;
     }
   ) {
     const spriteProps = {
       x: this.playerProps.x || 0,
       y: this.playerProps.y || 0,
+      anchor: this.playerProps.anchor,
       color: this.playerProps.color || '#fff',
     };
     const [leftKey, rightKey] = getPlayerControls();

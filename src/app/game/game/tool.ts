@@ -1,16 +1,15 @@
 import { DoorSwitch } from './doorSwitch';
-import { GoblinBomber } from './goblinBomber';
+import { createGameObject } from './gameObjectFactory';
+import { GameObjectType } from './gameObjects';
 import { IGameObject } from './iGameObject';
 
 export class Tool {
   go: IGameObject;
   isActive = false;
 
-  constructor(context: CanvasRenderingContext2D, type?: string) {
-    if (type == 'door') {
-      this.go = new DoorSwitch({ x: 0, y: 0 });
-    } else {
-      this.go = new GoblinBomber(context);
+  constructor(type: GameObjectType, context?: CanvasRenderingContext2D) {
+    if (type) {
+      this.go = createGameObject(type, { anchor: { x: 0, y: 0 } });
     }
   }
 
@@ -20,7 +19,7 @@ export class Tool {
     }
   }
   render(): void {
-    if (this.isActive && this.go) {
+    if (this.go) {
       this.go.render();
     }
   }

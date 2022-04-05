@@ -1,18 +1,13 @@
 <div id="toolbar">
   <button mat-button (click)="backButtonClick($event)">Back</button>
-  <div id="toolButtons">
+  <div id="toolButtons" #toolButtons>
     <button
       mat-button
       *ngFor="let btn of toolPanelBtns; index as i"
       (click)="handleToolClick(btn.tool)"
+      [ngClass]="{ selected: selectedTool === btn.tool }"
     >
-      <canvas
-        *ngIf="i === 0"
-        id="toolCanvas"
-        #toolCanvas
-        width="16"
-        height="16"
-      ></canvas>
+      <canvas width="16" height="16" #toolCanvas></canvas>
     </button>
   </div>
   <button

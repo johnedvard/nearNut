@@ -46,7 +46,12 @@ export class SpaceShip implements IGameObject {
 
   onSelectCharacter = ({ id }) => {
     this.gameOptions.characterId = id;
-    this.initSpaceShip({ x: this.sprite.x, y: this.sprite.y, color: '' });
+    this.initSpaceShip({
+      x: this.sprite.x,
+      y: this.sprite.y,
+      color: '',
+      anchor: this.sprite.anchor,
+    });
   };
   cleanup(): void {
     off(GameEvent.playerStateChange, this.onPlayerStateChange);
@@ -84,7 +89,7 @@ export class SpaceShip implements IGameObject {
     }
     return spriteSheet;
   }
-  initSpaceShip({ x, y, color }) {
+  initSpaceShip({ x, y, color, anchor }) {
     const spaceShip = this;
     const rotationSpeed = 5;
     load(this.getSelectedSpriteSheet()).then((assets) => {
@@ -108,12 +113,13 @@ export class SpaceShip implements IGameObject {
         },
       });
 
+      anchor = anchor || { x: 0.5, y: 0.5 };
       this.sprite = Sprite({
         x: x,
         y: y,
         height: 16,
         width: 16,
-        anchor: { x: 0.5, y: 0.5 },
+        anchor,
         animations: {
           ...spriteSheet.animations,
         },

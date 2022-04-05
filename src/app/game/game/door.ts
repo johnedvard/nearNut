@@ -10,8 +10,8 @@ export class Door implements IGameObject {
   ANIMATION_OPENING = 'opening';
   sprite: Sprite;
 
-  constructor({ x, y }) {
-    this.initDoor({ x, y });
+  constructor(options) {
+    this.initDoor(options);
     on(GameEvent.openDoor, this.onDoorOpen);
     on(GameEvent.doorCollision, this.onDoorCollision);
   }
@@ -56,7 +56,7 @@ export class Door implements IGameObject {
     }
   }
 
-  initDoor({ x, y }) {
+  initDoor({ x, y, anchor }) {
     load(
       'assets/platform_metroidvania/miscellaneous sprites/strange_door_closed_anim_strip_10.png',
       'assets/platform_metroidvania/miscellaneous sprites/strange_door_opening_anim_strip_14.png'
@@ -88,7 +88,7 @@ export class Door implements IGameObject {
       this.sprite = Sprite({
         x: x,
         y: y,
-        anchor: { x: 0.5, y: 0.5 },
+        anchor: anchor || { x: 0.5, y: 0.5 },
         animations: {
           ...closedSpriteSheet.animations,
           ...openingSpriteSheet.animations,

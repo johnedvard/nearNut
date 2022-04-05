@@ -6,8 +6,8 @@ import { IGameObject } from './iGameObject';
 export class GoblinBomber implements IGameObject {
   sprite: Sprite;
   readySubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  constructor(context) {
-    this.initGoblin({ x: 10, y: 10, context });
+  constructor(options) {
+    this.initGoblin(options);
   }
 
   update(dt: number): void {
@@ -24,7 +24,7 @@ export class GoblinBomber implements IGameObject {
     throw new Error('Method not implemented.');
   }
 
-  initGoblin({ x, y, context }) {
+  initGoblin({ x, y, context, anchor }) {
     load(
       'assets/platform_metroidvania/enemies sprites/bomber goblin/goblin_bomber_spritesheet.png'
     ).then((assets) => {
@@ -45,7 +45,7 @@ export class GoblinBomber implements IGameObject {
         y: y,
         height: 16,
         width: 16,
-        anchor: { x: 0.5, y: 0.5 },
+        anchor: anchor || { x: 0.5, y: 0.5 },
         animations: {
           ...spriteSheet.animations,
         },
