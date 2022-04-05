@@ -68,4 +68,7 @@ export class SwordWeapon implements Weapon {
   cleanup(): void {
     off(GameEvent.playerStateChange, this.onPlayerStateChange);
   }
+  setContext(context: CanvasRenderingContext2D): void {
+    this.sprite.context = context;
+  }
 }

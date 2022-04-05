@@ -178,4 +178,7 @@ export class SpaceShip implements IGameObject {
         this.setAnimation(PlayerAnimation.tracing);
     }
   };
+  setContext(context: CanvasRenderingContext2D): void {
+    this.sprite.context = context;
+  }
 }

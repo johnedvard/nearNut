@@ -3,12 +3,14 @@ import { GameEvent } from './gameEvent';
 import { DoorSwitchState } from './doorSwitchState';
 import { IGameObject } from './iGameObject';
 import { Player } from './player';
+import { BehaviorSubject } from 'rxjs';
 
 export class DoorSwitch implements IGameObject {
   private state: DoorSwitchState = DoorSwitchState.idle;
   ANIMATION_IDLE = 'idle';
   ANIMATION_COLLECTED = 'collected';
   sprite: Sprite;
+  readySubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor({ x, y }) {
     this.initDoorSwitch({ x, y });
@@ -81,6 +83,7 @@ export class DoorSwitch implements IGameObject {
           ...collectedSpriteSheet.animations,
         },
       });
+      this.readySubject.next(true);
     });
   }
   update(dt: number): void {
@@ -92,5 +95,13 @@ export class DoorSwitch implements IGameObject {
     if (this.sprite) {
       this.sprite.render();
     }
+  }
+  setContext(context: CanvasRenderingContext2D): void {
+    const subsc = this.readySubject.subscribe((ready) => {
+      if (ready) {
+        this.sprite.context = context;
+        subsc.unsubscribe();
+      }
+    });
   }
 }

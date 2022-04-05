@@ -7,4 +7,8 @@ export interface IGameObject {
    * Remove event listeners
    */
   cleanup(): void;
+  /**
+   * Change context of gameobject to render in a different canvas
+   */
+  setContext(context: CanvasRenderingContext2D): void;
 }

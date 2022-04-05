@@ -164,5 +164,8 @@ class Player implements IGameObject {
     this.sprite.color = color;
     this.spaceShip.sprite.color = color;
   }
+  setContext(context: CanvasRenderingContext2D): void {
+    this.sprite.context = context;
+  }
 }
 export { Player };

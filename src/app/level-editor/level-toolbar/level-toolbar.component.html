@@ -3,13 +3,18 @@
   <div id="toolButtons">
     <button
       mat-button
-      *ngFor="let btn of toolPanelBtns"
-      (click)="handleToolClick(btn)"
+      *ngFor="let btn of toolPanelBtns; index as i"
+      (click)="handleToolClick(btn.tool)"
     >
-      {{ btn.imgSrc }}
+      <canvas
+        *ngIf="i === 0"
+        id="toolCanvas"
+        #toolCanvas
+        width="16"
+        height="16"
+      ></canvas>
     </button>
   </div>
-
   <button
     [disabled]="editorState !== 'editing'"
     mat-button

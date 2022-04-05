@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ILevelData } from '../game/game/iLevelData';
+import { Tool } from '../game/game/tool';
 
 @Injectable({
   providedIn: 'root',
@@ -8,9 +9,7 @@ import { ILevelData } from '../game/game/iLevelData';
 export class LevelEditorService {
   levels: BehaviorSubject<ILevelData[]> = new BehaviorSubject<ILevelData[]>([]);
   tileSubject: BehaviorSubject<number> = new BehaviorSubject<number>(17); // defaults to delete tile
-  selectedToolSubject: BehaviorSubject<any> = new BehaviorSubject<any>(
-    'someTool'
-  ); // defaults to delete tile
+  selectedToolSubject: BehaviorSubject<Tool> = new BehaviorSubject<any>(null); // defaults to delete tile
   KEY_PREFIX = 'NearNut-';
   constructor() {
     this.levels.next(this.getLevelsFromLocalStorage());
@@ -96,7 +95,7 @@ export class LevelEditorService {
   setSelectedTool(tool: any) {
     this.selectedToolSubject.next(tool);
   }
-  getSelectedTool(): Observable<any> {
+  getSelectedTool(): Observable<Tool> {
     return this.selectedToolSubject.asObservable();
   }
   initEmptyLevel(levelIndex: number): ILevelData {

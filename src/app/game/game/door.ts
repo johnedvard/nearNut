@@ -107,4 +107,7 @@ export class Door implements IGameObject {
       this.sprite.render();
     }
   }
+  setContext(context: CanvasRenderingContext2D): void {
+    this.sprite.context = context;
+  }
 }

@@ -1,5 +1,7 @@
 import {
+  AfterViewInit,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
@@ -7,34 +9,45 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
-import { load, emit } from 'kontra';
+import { load, emit, GameLoop } from 'kontra';
 import { Subscription } from 'rxjs';
 import { tileMapNameDefault } from 'src/app/game/game/gameSettings';
+import { Tool } from 'src/app/game/game/tool';
 import { LevelEditorService } from '../level-editor.service';
 import { EditorState } from '../level-editor/level-editor.component';
+
+type ToolBtn = { imgSrc: string; tool: Tool };
 
 @Component({
   selector: 'app-level-toolbar',
   templateUrl: './level-toolbar.component.html',
   styleUrls: ['./level-toolbar.component.sass'],
 })
-export class LevelToolbarComponent implements OnInit, OnDestroy, OnChanges {
+export class LevelToolbarComponent
+  implements OnInit, AfterViewInit, OnDestroy, OnChanges
+{
   isTilesPanelOpen = false;
   tileSources: { src: string; tile: number }[] = [];
   selectedTileSrc: string;
   selectedTool: any;
-  toolPanelBtns = [
-    { imgSrc: 'tool', tool: 'someTool' },
-    { imgSrc: 'tool2', tool: 'someTool2' },
+  ctx: any;
+  toolPanelBtns: ToolBtn[] = [
+    { imgSrc: 'tool', tool: new Tool(null) },
+    { imgSrc: 'tool2', tool: new Tool(null, 'door') },
   ];
   selectedToolSub: Subscription;
 
+  @ViewChild('toolCanvas') toolCanvas: ElementRef;
   @Input() editorState: EditorState;
   @Output() backClick = new EventEmitter();
   constructor(private editorService: LevelEditorService) {
     this.selectedToolSub = editorService.getSelectedTool().subscribe((tool) => {
-      this.selectedTool = tool;
+      if (tool) {
+        this.selectedTool = tool;
+        this.selectedTool.isActive = true;
+      }
     });
   }
   ngOnChanges(changes: SimpleChanges): void {
@@ -48,14 +61,18 @@ export class LevelToolbarComponent implements OnInit, OnDestroy, OnChanges {
     this.backClick.emit(evt);
   }
 
-  handleToolClick(btn: any) {
-    this.editorService.setSelectedTool(btn.tool);
-    this.selectedTool = btn.tool;
+  handleToolClick(tool: Tool) {
+    console.log('click tool', tool);
+    if (this.selectedTool) {
+      this.selectedTool.isActive = false;
+    }
+    this.editorService.setSelectedTool(tool);
   }
 
   ngOnInit(): void {
     load(tileMapNameDefault).then((assets) => {
       const canvas = document.createElement('canvas');
+      canvas.setAttribute('id', 'tileCanvas');
       canvas.width = 32;
       canvas.height = 32;
       const ctx = canvas.getContext('2d');
@@ -86,12 +103,30 @@ export class LevelToolbarComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
       const tileSource = this.tileSources.find((tileSource) => {
-        console.log(tileSource);
         return tileSource.tile === this.editorService.tileSubject.getValue();
       });
-      console.log('tileSource', tileSource);
       this.selectedTileSrc = tileSource.src;
     });
+  }
+  ngAfterViewInit() {
+    this.ctx = (<any>document.getElementById('toolCanvas')).getContext('2d');
+    this.toolPanelBtns.forEach((btn) => {
+      btn.tool.setContext(this.ctx);
+    });
+    const loop = GameLoop({
+      context: this.ctx, // XXX (johnedvard) this isn't doing anything
+      update: (dt) => {
+        this.toolPanelBtns.forEach((btn) => {
+          btn.tool.update(dt);
+        });
+      },
+      render: () => {
+        this.toolPanelBtns.forEach((btn) => {
+          btn.tool.render();
+        });
+      },
+    });
+    loop.start();
   }
   openPaintTool() {
     this.isTilesPanelOpen = !this.isTilesPanelOpen;

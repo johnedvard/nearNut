@@ -1,19 +1,30 @@
 import { load, Sprite, SpriteSheet } from 'kontra';
+import { BehaviorSubject } from 'rxjs';
+import { GoblinBomberAnimations } from './goblinBomberAnimations';
 import { IGameObject } from './iGameObject';
 
 export class GoblinBomber implements IGameObject {
   sprite: Sprite;
+  readySubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  constructor(context) {
+    this.initGoblin({ x: 10, y: 10, context });
+  }
+
   update(dt: number): void {
-    throw new Error('Method not implemented.');
+    if (this.sprite) {
+      this.sprite.update(dt);
+    }
   }
   render(): void {
-    throw new Error('Method not implemented.');
+    if (this.sprite) {
+      this.sprite.render();
+    }
   }
   cleanup(): void {
     throw new Error('Method not implemented.');
   }
 
-  initGoblin({ x, y }) {
+  initGoblin({ x, y, context }) {
     load(
       'assets/platform_metroidvania/enemies sprites/bomber goblin/goblin_bomber_spritesheet.png'
     ).then((assets) => {
@@ -21,7 +32,12 @@ export class GoblinBomber implements IGameObject {
         image: assets[0],
         frameWidth: 16,
         frameHeight: 16,
-        animations: {},
+        animations: {
+          [GoblinBomberAnimations.idle]: {
+            frames: '12..15',
+            frameRate: 6,
+          },
+        },
       });
 
       this.sprite = Sprite({
@@ -34,6 +50,19 @@ export class GoblinBomber implements IGameObject {
           ...spriteSheet.animations,
         },
       });
+      if (context) {
+        this.sprite.context = context;
+      }
+      this.readySubject.next(true);
+    });
+  }
+  // Set context after sprite has been loaded
+  setContext(context) {
+    const subsc = this.readySubject.subscribe((ready) => {
+      if (ready) {
+        this.sprite.context = context;
+        subsc.unsubscribe();
+      }
     });
   }
 }

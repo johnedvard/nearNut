@@ -61,4 +61,7 @@ export class EngineParticleEffect implements IGameObject {
   update(dt: number): void {
     this.sprite.update(dt);
   }
+  setContext(context: CanvasRenderingContext2D): void {
+    this.sprite.context = context;
+  }
 }
