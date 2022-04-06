@@ -5,6 +5,7 @@ import {
   onPointer,
   TileEngine,
 } from 'kontra';
+import { Subscription } from 'rxjs';
 import { EditorTile } from './editorTile';
 import { getGameOjectKey } from './gameObjectFactory';
 import { GameObjectType } from './gameObjects';
@@ -12,9 +13,9 @@ import { getCol, getMaxSxSy, getRow } from './gameUtils';
 import { IAngularServices } from './iAngularServices';
 import { IGameObject } from './iGameObject';
 import { ILevelData } from './iLevelData';
+import { Tool } from './tool';
 
 type PointerState = 'panning' | 'idle' | 'drawing' | 'erasing' | 'dragging';
-type Tool = 'block';
 type Brush = 'main';
 export class EditorControls {
   DELETE_TILE = 0;
@@ -25,7 +26,7 @@ export class EditorControls {
   FORWARD_BUTTON = 4;
   scale: number;
   pointerState: PointerState = 'panning';
-  selectedTool: Tool = 'block';
+  selectedTool: Tool;
   selectedTile = this.DELETE_TILE;
   draggingObject;
   selectedBrush: Brush = 'main';
@@ -38,6 +39,7 @@ export class EditorControls {
   currCol = 0;
   currRow = 0;
   gos: IGameObject[] = [];
+  subscriptions: Subscription[] = [];
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -53,9 +55,17 @@ export class EditorControls {
       mapwidth: this.tileEngine.mapwidth,
       mapheight: this.tileEngine.mapheight,
     });
-    this.angularServices.editorService
+    const tileSub = this.angularServices.editorService
       .getTileId()
       .subscribe((tile) => this.onSelectTile({ tile }));
+    const toolSub = this.angularServices.editorService
+      .getSelectedTool()
+      .subscribe((tool) => {
+        if (tool) {
+          this.selectedTool = tool;
+        }
+      });
+    this.subscriptions.push(...[tileSub, toolSub]);
   }
 
   onSelectTile = ({ tile }) => {
@@ -87,6 +97,8 @@ export class EditorControls {
     }
   }
   draw() {
+    if (this.selectedTool) {
+    }
     switch (this.selectedBrush) {
       case 'main':
         this.drawTile(this.selectedTile);
@@ -265,5 +277,6 @@ export class EditorControls {
     this.gos.length = 0;
     offPointer('down');
     offPointer('up');
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 }

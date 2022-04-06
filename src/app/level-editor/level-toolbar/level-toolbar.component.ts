@@ -34,6 +34,7 @@ export class LevelToolbarComponent
   tileSources: { src: string; tile: number }[] = [];
   selectedTileSrc: string;
   selectedTool: Tool;
+  tileTool: Tool = new Tool(); // tool used for drawing the tiles. Doesn't use any sprite
   toolPanelBtns: ToolBtn[] = [
     { imgSrc: 'tool', tool: new Tool('goblinBomber') },
     { imgSrc: 'tool2', tool: new Tool('doorSwitch') },
@@ -45,9 +46,13 @@ export class LevelToolbarComponent
   @Output() backClick = new EventEmitter();
   constructor(private editorService: LevelEditorService) {
     this.selectedToolSub = editorService.getSelectedTool().subscribe((tool) => {
+      console.log('got new tool');
       if (tool) {
+        if (this.selectedTool) {
+          this.selectedTool.isActive = false;
+        }
+        tool.isActive = true;
         this.selectedTool = tool;
-        this.selectedTool.isActive = true;
       }
     });
   }
@@ -63,10 +68,6 @@ export class LevelToolbarComponent
   }
 
   handleToolClick(tool: Tool) {
-    console.log('click tool', tool);
-    if (this.selectedTool) {
-      this.selectedTool.isActive = false;
-    }
     this.editorService.setSelectedTool(tool);
   }
 
@@ -133,6 +134,7 @@ export class LevelToolbarComponent
   }
   openPaintTool() {
     this.isTilesPanelOpen = !this.isTilesPanelOpen;
+    this.editorService.setSelectedTool(this.tileTool);
   }
   closeToolbar() {
     this.isTilesPanelOpen = false;
@@ -141,7 +143,6 @@ export class LevelToolbarComponent
     console.log('open dialog');
   }
   handleTilesPanelClick(evt) {
-    console.log('handle tile panel click');
     if (evt && evt.target) {
       if (evt.target.id.match('tileIndex-')) {
         this.selectedTileSrc = evt.target.src;

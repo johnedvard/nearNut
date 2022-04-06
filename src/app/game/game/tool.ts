@@ -7,7 +7,7 @@ export class Tool {
   go: IGameObject;
   isActive = false;
 
-  constructor(type: GameObjectType, context?: CanvasRenderingContext2D) {
+  constructor(type?: GameObjectType, context?: CanvasRenderingContext2D) {
     if (type) {
       this.go = createGameObject(type, { anchor: { x: 0, y: 0 } });
     }

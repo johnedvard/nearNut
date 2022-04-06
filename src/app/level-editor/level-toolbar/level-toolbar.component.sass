@@ -11,6 +11,9 @@
   display: flex
   justify-content: center
   justify-items: center
+
+  button
+    border: 2px solid white
   .selected
     border: 2px solid common.$primary-foreground
 
@@ -20,10 +23,10 @@
 
 #paintTool
   margin-right: 14px
-  img
-    padding: 4px
-    outline: 2px solid white
-    border-radius: 2px
+  border: 2px solid white
+  padding: 0px
+  &.selected
+    border: 2px solid common.$primary-foreground
 
 #tilesPanel
   position: absolute
