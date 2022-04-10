@@ -260,25 +260,27 @@ export class Game {
 
   checkCameraControls() {
     if (!this.player.sprite) return;
-    const pan = (key, max, cameraDiff) => {
-      let camPos = this.tileEngine[key];
-      if (cameraDiff > 140) {
-        camPos += 5;
-      } else if (cameraDiff < 60) {
-        camPos -= 5;
+    const pan = (sxy, xy, max, cameraDiff) => {
+      const maxDiff = 120;
+      const minDiff = 100;
+      let camPos = this.tileEngine[sxy];
+      if (cameraDiff > maxDiff) {
+        camPos = this.player.sprite[xy] - maxDiff;
+      } else if (cameraDiff < minDiff) {
+        camPos = this.player.sprite[xy] - minDiff;
       }
       if (camPos >= max) {
         camPos = max;
       } else if (camPos <= 0) {
         camPos = 0;
       }
-      this.tileEngine[key] = lerp(this.tileEngine[key], camPos, 0.3);
+      this.tileEngine[sxy] = lerp(this.tileEngine[sxy], camPos, 1);
     };
     const caneraDiffX = this.player.sprite.x - this.tileEngine.sx;
     const caneraDiffY = this.player.sprite.y - this.tileEngine.sy;
 
-    pan('sx', this.maxSx, caneraDiffX);
-    pan('sy', this.maxSy, caneraDiffY);
+    pan('sx', 'x', this.maxSx, caneraDiffX);
+    pan('sy', 'y', this.maxSy, caneraDiffY);
   }
 
   initKeyBindings() {
