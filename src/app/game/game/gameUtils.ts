@@ -1,7 +1,7 @@
 import { GameObject, load, Sprite, TileEngine } from 'kontra';
 import { Game } from './game';
 import { ILevelData } from './iLevelData';
-import { GameObjects } from './gameObjects';
+import { ILevelGameObject } from './gameObjects';
 import { tileMapNameDefault } from './gameSettings';
 
 export const getPlayerControls = (): string[] => {
@@ -34,7 +34,10 @@ export const isOutOfBounds = (game: Game, go: Sprite): boolean => {
 
 export const loadLevelFromObject = (
   level: ILevelData
-): Promise<{ tileEngine: TileEngine; gameObjects: GameObjects }> => {
+): Promise<{
+  tileEngine: TileEngine;
+  gameObjects: ILevelGameObject[];
+}> => {
   return load(tileMapNameDefault).then((assets) => {
     // can also use dataAssets (stores all kontra assets)
     level.tilesets = [{ image: assets[0], firstgid: 1 }];
@@ -45,7 +48,10 @@ export const loadLevelFromObject = (
 
 export const loadLevelFromFile = (
   levelName: string
-): Promise<{ tileEngine: TileEngine; gameObjects: GameObjects }> => {
+): Promise<{
+  tileEngine: TileEngine;
+  gameObjects: ILevelGameObject[];
+}> => {
   return load(tileMapNameDefault, `assets/levels/${levelName}.json`).then(
     (assets) => {
       console.warn(

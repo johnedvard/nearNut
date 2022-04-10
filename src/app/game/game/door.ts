@@ -5,6 +5,7 @@ import { IGameObject } from './iGameObject';
 import { Player } from './player';
 
 export class Door implements IGameObject {
+  id: string;
   private state: DoorState = DoorState.closed;
   ANIMATION_CLOSED = 'closed';
   ANIMATION_OPENING = 'opening';

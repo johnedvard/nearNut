@@ -112,12 +112,12 @@ export class LevelEditorService {
           data: [],
         },
       ],
-      gameObjects: {
-        player: { x: 40, y: 40 },
-        door: { x: 218, y: 72 },
-        doorSwitch: { x: 100, y: 60 },
-        goal: { x: 140, y: 60 },
-      },
+      gameObjects: [
+        { type: 'player', id: 'player', x: 40, y: 40 },
+        { type: 'door', id: 'door', x: 218, y: 72 },
+        { type: 'doorSwitch', id: 'doorSwitch', x: 100, y: 60 },
+        { type: 'goal', id: 'goal', x: 140, y: 60 },
+      ],
     };
 
     return level;

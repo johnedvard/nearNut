@@ -5,6 +5,7 @@ export type GameObjectType =
   | 'doorSwitch'
   | 'goal'
   | 'goblinBomber';
+
 export function isOfTypeGameObject(
   keyInput: string
 ): keyInput is GameObjectType {
@@ -12,10 +13,9 @@ export function isOfTypeGameObject(
     keyInput
   );
 }
-export interface GameObjects {
-  door?: { x: number; y: number };
-  player?: { x: number; y: number };
-  doorSwitch?: { x: number; y: number };
-  goal?: { x: number; y: number };
-  goblinBomber?: { x: number; y: number };
+export interface ILevelGameObject {
+  type: GameObjectType;
+  id: string;
+  x: number;
+  y: number;
 }

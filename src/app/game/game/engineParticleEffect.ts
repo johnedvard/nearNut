@@ -6,6 +6,7 @@ function coneEffect(rotation) {
 }
 
 export class EngineParticleEffect implements IGameObject {
+  id: string;
   sprite: Sprite;
   private pool: Pool;
   x = 0;

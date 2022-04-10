@@ -8,7 +8,7 @@ import {
 } from 'kontra';
 import { Subscription } from 'rxjs';
 import { EditorTile } from './editorTile';
-import { createGameObject, getGameOjectKey } from './gameObjectFactory';
+import { createGameObject, getGameOjectType } from './gameObjectFactory';
 import { GameObjectType } from './gameObjects';
 import { getCol, getMaxSxSy, getRow, rectCollision } from './gameUtils';
 import { IAngularServices } from './iAngularServices';
@@ -28,7 +28,7 @@ export class EditorControls {
   pointerState: PointerState = 'panning';
   selectedTool: Tool;
   selectedTile = this.DELETE_TILE;
-  draggingObject;
+  draggingObject: IGameObject;
   selectedBrush: Brush = 'main';
   altDragStartPos = { x: 0, y: 0 };
   currTileEngineSx = 0;
@@ -113,13 +113,19 @@ export class EditorControls {
     const { col, row } = this.getColRowPointer(p);
     const x = col * this.tileEngine.tilewidth + this.tileEngine.tilewidth / 2;
     const y = row * this.tileEngine.tileheight + this.tileEngine.tileheight / 2;
-    const goClone = createGameObject(getGameOjectKey(tool.go), {
+    const goClone = createGameObject(getGameOjectType(tool.go), {
       x,
       y,
     });
     // TODO add to level as well
     this.gos.push(goClone);
     this.tileEngine.add(goClone);
+    this.level.gameObjects.push({
+      x,
+      y,
+      id: goClone.id,
+      type: getGameOjectType(tool.go),
+    });
   }
   /**
    * Also draws adjecent tiles
@@ -207,15 +213,16 @@ export class EditorControls {
     this.setPointerState('idle');
 
     if (this.draggingObject) {
-      const key = getGameOjectKey(this.draggingObject);
-      this.updateLevelData(key, this.draggingObject.sprite);
+      this.updateLevelData(this.draggingObject);
       this.draggingObject = null;
     }
   };
 
-  updateLevelData(key: GameObjectType, gameObj: GameObject) {
-    this.level.gameObjects[key].x = gameObj.x;
-    this.level.gameObjects[key].y = gameObj.y;
+  updateLevelData(go: IGameObject) {
+    const levelGo = this.level.gameObjects.find((levGo) => levGo.id === go.id);
+    if (!levelGo) throw new Error('Object not found in level: ' + go.id);
+    levelGo.y = go.sprite.y;
+    levelGo.x = go.sprite.x;
   }
 
   onPointerDown = (e) => {

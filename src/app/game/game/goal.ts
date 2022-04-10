@@ -4,6 +4,7 @@ import { IGameObject } from './iGameObject';
 import { Player } from './player';
 
 export class Goal implements IGameObject {
+  id: string;
   sprite: Sprite;
 
   constructor(options) {

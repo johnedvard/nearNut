@@ -16,23 +16,32 @@ export const createGameObject = (
 ): IGameObject => {
   if (!isOfTypeGameObject(key)) throw new Error('Not a valid type');
   const type = <GameObjectType>key;
+  let go = null;
   switch (type) {
     case 'player':
-      return new Player({ ...data });
+      go = new Player({ ...data });
+      break;
     case 'door':
-      return new Door({ ...data });
+      go = new Door({ ...data });
+      break;
     case 'doorSwitch':
-      return new DoorSwitch({ ...data });
+      go = new DoorSwitch({ ...data });
+      break;
     case 'goal':
-      return new Goal({ ...data });
+      go = new Goal({ ...data });
+      break;
     case 'goblinBomber':
-      return new GoblinBomber({ ...data });
+      go = new GoblinBomber({ ...data });
+      break;
     default:
       throw new Error('Not a valid game object type');
   }
+  // TODO (johnedvard) maybe generate a unique ID
+  go.id = data.id || '' + Date.now();
+  return go;
 };
 
-export const getGameOjectKey = (go: IGameObject): GameObjectType => {
+export const getGameOjectType = (go: IGameObject): GameObjectType => {
   if (go instanceof Player) {
     return 'player';
   } else if (go instanceof Door) {

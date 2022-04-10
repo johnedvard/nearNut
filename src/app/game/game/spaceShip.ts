@@ -13,6 +13,7 @@ import { SwordWeapon } from './swordWeapon';
 import { Weapon } from './weapon';
 
 export class SpaceShip implements IGameObject {
+  id: string;
   sprite: Sprite;
   rightKey = 'right';
   leftKey = 'left';

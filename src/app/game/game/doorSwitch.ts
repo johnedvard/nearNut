@@ -6,6 +6,7 @@ import { Player } from './player';
 import { BehaviorSubject } from 'rxjs';
 
 export class DoorSwitch implements IGameObject {
+  id: string;
   private state: DoorSwitchState = DoorSwitchState.idle;
   ANIMATION_IDLE = 'idle';
   ANIMATION_COLLECTED = 'collected';

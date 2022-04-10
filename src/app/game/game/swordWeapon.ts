@@ -6,6 +6,7 @@ import { PlayerStateChangeEvent } from './playerStateChangeEvent';
 import { Weapon } from './weapon';
 
 export class SwordWeapon implements Weapon {
+  id: string;
   sprite: Sprite;
   playerState: PlayerState;
   constructor() {

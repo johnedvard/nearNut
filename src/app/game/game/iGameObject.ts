@@ -1,5 +1,7 @@
 import { Sprite } from 'kontra';
+
 export interface IGameObject {
+  id: string;
   sprite: Sprite;
   update(dt: number): void;
   render(): void;

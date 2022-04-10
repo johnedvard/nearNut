@@ -4,6 +4,7 @@ import { GoblinBomberAnimations } from './goblinBomberAnimations';
 import { IGameObject } from './iGameObject';
 
 export class GoblinBomber implements IGameObject {
+  id: string;
   sprite: Sprite;
   readySubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   constructor(options) {

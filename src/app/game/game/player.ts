@@ -10,6 +10,7 @@ import { SpaceShip } from './spaceShip';
 import { IGameOptions } from './iGameOptions';
 
 class Player implements IGameObject {
+  id: string;
   sprite: Sprite;
   dummy: Sprite;
   spaceShip: SpaceShip;
@@ -22,6 +23,7 @@ class Player implements IGameObject {
   currAnimationTimeLapsed = 0;
   constructor(
     private playerProps: {
+      id: string;
       color: string;
       x: number;
       y: number;
@@ -29,6 +31,7 @@ class Player implements IGameObject {
       gameOptions?: IGameOptions;
     }
   ) {
+    this.id = playerProps.id || '' + Date.now();
     const spriteProps = {
       x: this.playerProps.x || 0,
       y: this.playerProps.y || 0,

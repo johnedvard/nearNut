@@ -24,7 +24,7 @@ import { Door } from './door';
 import { DoorSwitch } from './doorSwitch';
 import { IGameObject } from './iGameObject';
 import { ILevelData } from './iLevelData';
-import { GameObjects } from './gameObjects';
+import { ILevelGameObject } from './gameObjects';
 import { Player } from './player';
 import { PlayerState } from './playerState';
 import { PlayerStateChangeEvent } from './playerStateChangeEvent';
@@ -37,7 +37,7 @@ export class Game {
   private state: GameState = GameState.loading;
   scale = 2;
   canvas: HTMLCanvasElement;
-  gameObjects: GameObjects;
+  gameObjects: ILevelGameObject[];
   gameOptions: IGameOptions;
   gos: IGameObject[] = [];
   loop: GameLoop;
@@ -139,19 +139,17 @@ export class Game {
       this.gos.forEach((go) => {
         this.tileEngine.remove(go);
       });
-      for (const key in gameObjects) {
-        if (gameObjects.hasOwnProperty(key)) {
-          const gameObj = createGameObject(key, {
-            ...gameObjects[key],
-            gameOptions,
-          });
-          if (gameObj instanceof Player) {
-            this.player = gameObj;
-          }
-          this.gos.push(gameObj);
-          this.tileEngine.add(gameObj);
+      gameObjects.forEach((levelGo) => {
+        const gameObj = createGameObject(levelGo.type, {
+          ...levelGo,
+          gameOptions,
+        });
+        if (gameObj instanceof Player) {
+          this.player = gameObj;
         }
-      }
+        this.gos.push(gameObj);
+        this.tileEngine.add(gameObj);
+      });
     }
 
     on(GameEvent.startGame, this.onStartGame);

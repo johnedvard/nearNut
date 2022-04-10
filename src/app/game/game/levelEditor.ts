@@ -1,15 +1,5 @@
-import {
-  GameLoop,
-  init,
-  initKeys,
-  initPointer,
-  off,
-  on,
-  TileEngine,
-  track,
-} from 'kontra';
+import { GameLoop, init, initKeys, initPointer, TileEngine } from 'kontra';
 import { EditorControls } from './editorControls';
-import { GameEvent } from './gameEvent';
 import { createGameObject } from './gameObjectFactory';
 import { gameHeight, gameWidth } from './gameSettings';
 import { loadLevelFromObject } from './gameUtils';
@@ -96,16 +86,14 @@ export class LevelEditor {
     );
 
     console.log('this.gameOptions', this.gameOptions);
-    for (const key in gameObjects) {
-      if (gameObjects.hasOwnProperty(key)) {
-        const gameObj = createGameObject(key, {
-          ...gameObjects[key],
-          gameOptions: this.gameOptions,
-        });
-        this.gos.push(gameObj);
-        tileEngine.add(gameObj);
-      }
-    }
+    gameObjects.forEach((levelGo) => {
+      const gameObj = createGameObject(levelGo.type, {
+        ...levelGo,
+        gameOptions: this.gameOptions,
+      });
+      this.gos.push(gameObj);
+      tileEngine.add(gameObj);
+    });
 
     const loop = GameLoop({
       update: (dt: number) => {

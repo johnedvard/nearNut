@@ -1,4 +1,4 @@
-import { GameObjects } from './gameObjects';
+import { ILevelGameObject } from './gameObjects';
 
 type Layer = {
   name: string;
@@ -12,5 +12,5 @@ export interface ILevelData {
   height: number;
   tilesets: any[];
   layers: Layer[];
-  gameObjects: GameObjects;
+  gameObjects: ILevelGameObject[];
 }

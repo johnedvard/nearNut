@@ -428,10 +428,10 @@
       "_d": false
     }
   ],
-  "gameObjects": {
-    "player": { "x": 66.25, "y": 142 },
-    "door": { "x": 163.25, "y": 138.5 },
-    "doorSwitch": { "x": 134.75, "y": 140.5 },
-    "goal": { "x": 237.25, "y": 147 }
-  }
+  "gameObjects": [
+    { "id": "player", "type": "player", "x": 66.25, "y": 142 },
+    { "id": "door", "type": "door", "x": 163.25, "y": 138.5 },
+    { "id": "doorSwitch", "type": "doorSwitch", "x": 134.75, "y": 140.5 },
+    { "id": "goal", "type": "goal", "x": 237.25, "y": 147 }
+  ]
 }
