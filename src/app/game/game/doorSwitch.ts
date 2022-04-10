@@ -20,8 +20,8 @@ export class DoorSwitch implements IGameObject {
   cleanup(): void {
     off(GameEvent.doorSwitchCollision, this.onDoorSwitchCollision);
   }
-  onDoorSwitchCollision = ({ other }) => {
-    if (other instanceof Player) {
+  onDoorSwitchCollision = ({ other, self }) => {
+    if (self == this && other instanceof Player) {
       this.setState(DoorSwitchState.collected);
     }
   };

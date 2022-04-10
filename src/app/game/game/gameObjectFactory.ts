@@ -41,6 +41,8 @@ export const getGameOjectKey = (go: IGameObject): GameObjectType => {
     return 'doorSwitch';
   } else if (go instanceof Goal) {
     return 'goal';
+  } else if (go instanceof GoblinBomber) {
+    return 'goblinBomber';
   } else {
     throw new Error('Not a valid type');
   }

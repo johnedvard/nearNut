@@ -3,13 +3,14 @@ import {
   getPointer,
   offPointer,
   onPointer,
+  Sprite,
   TileEngine,
 } from 'kontra';
 import { Subscription } from 'rxjs';
 import { EditorTile } from './editorTile';
-import { getGameOjectKey } from './gameObjectFactory';
+import { createGameObject, getGameOjectKey } from './gameObjectFactory';
 import { GameObjectType } from './gameObjects';
-import { getCol, getMaxSxSy, getRow } from './gameUtils';
+import { getCol, getMaxSxSy, getRow, rectCollision } from './gameUtils';
 import { IAngularServices } from './iAngularServices';
 import { IGameObject } from './iGameObject';
 import { ILevelData } from './iLevelData';
@@ -24,7 +25,6 @@ export class EditorControls {
   SECONDARY_BUTTON = 2;
   BACK_BUTTON = 3;
   FORWARD_BUTTON = 4;
-  scale: number;
   pointerState: PointerState = 'panning';
   selectedTool: Tool;
   selectedTile = this.DELETE_TILE;
@@ -38,17 +38,16 @@ export class EditorControls {
   maxSy = 0; // number of mapheight pixels not inside the canvas
   currCol = 0;
   currRow = 0;
-  gos: IGameObject[] = [];
   subscriptions: Subscription[] = [];
 
   constructor(
     private canvas: HTMLCanvasElement,
     private tileEngine: TileEngine,
     private level: ILevelData,
-    { scale },
-    private angularServices?: IAngularServices
+    private scale,
+    private angularServices?: IAngularServices,
+    private gos?: IGameObject[]
   ) {
-    this.scale = scale;
     onPointer('down', this.onPointerDown);
     onPointer('up', this.onPointerUp);
     this.setMaxSxSy({
@@ -97,20 +96,68 @@ export class EditorControls {
     }
   }
   draw() {
-    if (this.selectedTool) {
+    if (this.selectedTool && !this.selectedTool.isTileTool) {
+      this.drawTool(this.selectedTool);
+      return;
     }
     switch (this.selectedBrush) {
       case 'main':
         this.drawTile(this.selectedTile);
-        break;
+        return;
     }
+  }
+
+  drawTool(tool: Tool) {
+    const p = getPointer();
+    if (!this.isTileAvailable(p)) return;
+    const { col, row } = this.getColRowPointer(p);
+    const x = col * this.tileEngine.tilewidth + this.tileEngine.tilewidth / 2;
+    const y = row * this.tileEngine.tileheight + this.tileEngine.tileheight / 2;
+    const goClone = createGameObject(getGameOjectKey(tool.go), {
+      x,
+      y,
+    });
+    // TODO add to level as well
+    this.gos.push(goClone);
+    this.tileEngine.add(goClone);
   }
   /**
    * Also draws adjecent tiles
    */
   drawTile(tileToDraw) {
+    const { col, row } = this.setCurrColRow();
     const layerName = 'ground';
+
+    // TODO (johnedvard) Expand tilemap if out of bounds
+    const adjacentTiles = this.getAdjecentTiles({ col, row, layerName });
+    if (tileToDraw === this.DELETE_TILE) {
+      this.tileEngine.setTileAtLayer(layerName, { col, row }, 14); // the "empty" tile
+    }
+    // Need to set timout to draw two times in case of delete tile
+    setTimeout(() => {
+      this.tileEngine.setTileAtLayer(layerName, { col, row }, tileToDraw);
+    });
+  }
+  isTileAvailable(p): boolean {
+    let isAvailable = true;
+    const { col, row } = this.getColRowPointer(p);
+    this.gos.forEach((go) => {
+      const goCoord = this.getColRowGo(go.sprite);
+      if (col === goCoord.col && row === goCoord.row) {
+        isAvailable = false;
+        return;
+      }
+    });
+    return isAvailable;
+  }
+  setCurrColRow() {
     const p = getPointer();
+    const { col, row } = this.getColRowPointer(p);
+    this.currCol = col;
+    this.currRow = row;
+    return { col, row };
+  }
+  getColRowPointer(p): { col: number; row: number } {
     const row = getRow(
       p.y,
       this.tileEngine.tileheight,
@@ -123,18 +170,13 @@ export class EditorControls {
       this.scale,
       this.tileEngine.sx
     );
-    this.currCol = col;
-    this.currRow = row;
-
-    // TODO (johnedvard) Expand tilemap if out of bounds
-    const adjacentTiles = this.getAdjecentTiles({ col, row, layerName });
-    if (tileToDraw === this.DELETE_TILE) {
-      this.tileEngine.setTileAtLayer(layerName, { col, row }, 14); // the "empty" tile
-    }
-    // Need to set timout to draw two times in case of delete tile
-    setTimeout(() => {
-      this.tileEngine.setTileAtLayer(layerName, { col, row }, tileToDraw);
-    });
+    return { col, row };
+  }
+  getColRowGo(go: GameObject): { col: number; row: number } {
+    if (!go) return { col: -1, row: -1 };
+    const row = getRow(go.y, this.tileEngine.tileheight, 1, 0);
+    const col = getCol(go.x, this.tileEngine.tilewidth, 1, 0);
+    return { col, row };
   }
   getAdjecentTiles({ col, row, layerName }): EditorTile[] {
     const nwCoord = { row: row - 1, col: col - 1 };
@@ -267,10 +309,6 @@ export class EditorControls {
     if (sy >= this.maxSy) {
       this.changeTilemapSize({ row: 1, col: 0 });
     }
-  }
-
-  addGameObject(gameObj: IGameObject) {
-    this.gos.push(gameObj);
   }
 
   cleanup() {

@@ -20,9 +20,7 @@ export class GoblinBomber implements IGameObject {
       this.sprite.render();
     }
   }
-  cleanup(): void {
-    throw new Error('Method not implemented.');
-  }
+  cleanup(): void {}
 
   initGoblin({ x, y, context, anchor }) {
     load(

@@ -211,7 +211,7 @@ export class Game {
   checkDoorSwitchColllision(doorSwitch: DoorSwitch, go: IGameObject) {
     if (doorSwitch && go.sprite) {
       if (rectCollision(doorSwitch.sprite, go.sprite)) {
-        emit(GameEvent.doorSwitchCollision, { other: go });
+        emit(GameEvent.doorSwitchCollision, { self: doorSwitch, other: go });
       }
     }
   }

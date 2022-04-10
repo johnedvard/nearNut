@@ -90,10 +90,9 @@ export class LevelEditor {
       this.canvas,
       this.tileEngine,
       this.level,
-      {
-        scale: this.scale,
-      },
-      this.angularServices
+      this.scale,
+      this.angularServices,
+      this.gos
     );
 
     console.log('this.gameOptions', this.gameOptions);
@@ -104,7 +103,6 @@ export class LevelEditor {
           gameOptions: this.gameOptions,
         });
         this.gos.push(gameObj);
-        this.editorControls.addGameObject(gameObj);
         tileEngine.add(gameObj);
       }
     }
@@ -118,6 +116,7 @@ export class LevelEditor {
       },
       render: () => {
         if (this.ctx.imageSmoothingEnabled) {
+          // resets when canvas (size) changes
           this.ctx.imageSmoothingEnabled = false;
         }
         if (tileEngine) {

@@ -6,10 +6,15 @@ import { IGameObject } from './iGameObject';
 export class Tool {
   go: IGameObject;
   isActive = false;
+  isTileTool = false; // TODO (johnedvard) Used for drawing tiles, but maybe convert the brush to a go instead?
 
   constructor(type?: GameObjectType, context?: CanvasRenderingContext2D) {
     if (type) {
-      this.go = createGameObject(type, { anchor: { x: 0, y: 0 } });
+      this.go = createGameObject(type, {
+        anchor: { x: 0, y: 0 },
+      });
+    } else {
+      this.isTileTool = true;
     }
   }
 
